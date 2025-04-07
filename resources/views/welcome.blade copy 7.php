@@ -4,16 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Gincaneiros - Adivinhe o local</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-   
+    
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- SweetAlert2 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     
     <style>
@@ -31,6 +29,7 @@
             padding-top: 56px;
         }
         
+        /* Navbar */
         .navbar {
             background-color: var(--secondary-color);
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -54,12 +53,14 @@
             margin-left: 10px;
         }
         
+        /* Game Container */
         .game-container {
-            height: calc(100vh - 106px);
+            height: calc(100vh - 106px); /* Ajustado para o rodapé */
             position: relative;
             overflow: hidden;
         }
         
+        /* Street View Container */
         #street-view-container {
             width: 100%;
             height: 100%;
@@ -81,6 +82,7 @@
 
         .map-toggle {
             position: fixed;
+           /* bottom: 80px; Ajustado para o rodapé */
             top:50%;
             transform: translateY(-50%);
             right: 20px;
@@ -99,6 +101,7 @@
             border: 2px solid var(--primary-color);
         }
         
+        /* Map Container */
         #map-container {
             position: absolute;
             top: 0;
@@ -122,9 +125,10 @@
             height: 100%;
         }
         
+        /* Confirm Button */
         .confirm-btn-container {
             position: absolute;
-            bottom: 80px;
+            bottom: 80px; /* Ajustado para o rodapé */
             left: 0;
             width: 100%;
             display: flex;
@@ -133,8 +137,10 @@
         }
         
         .confirm-btn {
+           /* background-color: var(--success-color);*/
             background-color: yellow;
             color:black;
+            /*color: white;*/
             border: none;
             padding: 12px 30px;
             border-radius: 30px;
@@ -146,6 +152,7 @@
             gap: 10px;
         }
         
+        /* Rodapé */
         .app-footer {
             position: fixed;
             bottom: 0;
@@ -155,7 +162,7 @@
             text-align: center;
             padding: 10px 0;
             z-index: 1000;
-            border-top: 2px solid white;/*var(--accent-color);*/
+            border-top: 2px solid var(--accent-color);
         }
         
         .social-icons {
@@ -173,10 +180,12 @@
             color: var(--accent-color);
         }
         
+        /* Mobile Optimization */
         @media (max-width: 768px) {
             .map-toggle {
                 width: 50px;
                 height: 50px;
+                /*bottom: 70px;  Ajustado para o rodapé */
                 right: 15px;
             }
             
@@ -186,10 +195,11 @@
             }
             
             .game-container {
-                height: calc(100vh - 96px);
+                height: calc(100vh - 96px); /* Ajuste para mobile */
             }
         }
         
+        /* Offcanvas Menu */
         .offcanvas-header {
             background-color: var(--secondary-color);
             color: white;
@@ -208,6 +218,7 @@
             color: var(--primary-color);
         }
         
+        /* Estilo para botões de compartilhamento */
         .share-buttons {
             display: flex;
             justify-content: center;
@@ -229,20 +240,13 @@
         
         .whatsapp { background-color: #25D366; }
         .facebook { background-color: #3b5998; }
+        .twitter { background-color: #1DA1F2; }
         .link { background-color: var(--secondary-color); }
-        
-        .custom-marker {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            z-index: 999;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-        }
     </style>
 </head>
-<body class="bg-gray-100 pt-16">
-    <!-- <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
             <a class="navbar-brand" href="#">
                 <i class="fas fa-globe-americas me-2"></i>Gincaneiros
@@ -282,76 +286,25 @@
                 </div>
             </div>
         </div>
-    </nav> -->
-
-    <nav class="bg-white shadow-md fixed top-0 left-0 w-full z-30">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <a href="/" class="text-xl font-bold">Gincaneiros</a>
-                    <div class="score-display ml-4">
-                        <i class="fas fa-trophy me-1"></i> <span id="score">0</span>
-                    </div>
-                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-                        <!-- <a href="#" id="about-link" class="text-gray-500 hover:text-gray-700">Sobre</a>
-                        <button onclick="startTour()" class="text-gray-500 hover:text-gray-700">
-                            Como Funciona
-                        </button>
-                        <a href="#" id="contact-link" class="text-red-500 hover:text-red-700">Modo Família & amigos</a> -->
-                    </div>
-                </div>
-                <div class="flex items-center">
-                    <span id="user-info" class="text-gray-500 mr-4"></span>
-                    <!-- Botão de Login (visível quando não logado) -->
-                    <!-- <button id="login-button" onclick="loginWithGoogle()" class="text-gray-500 hover:text-gray-700" style="display: none;">
-                        Login
-                    </button> -->
-                    <!-- Botão de Logout (visível quando logado) -->
-                    <button id="logout-button" onclick="logout()" class="text-gray-500 hover:text-gray-700" style="display: none;">
-                        Logout
-                    </button>
-                    <button id="mobile-menu-button" class="sm:hidden p-2 text-red-700 hover:text-red-800">
-                        <img src="https://media.tenor.com/MG0VpR0F0-sAAAAi/icon-cute.gif" alt="help" style="width: 40px; height: 40px;">
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div id="mobile-menu" class="sm:hidden hidden">
-            <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                <li class="nav-item">
-                    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#howToPlayModal">
-                        <i class="fas fa-question-circle me-2"></i>Como Jogar
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#aboutModal">
-                        <i class="fas fa-info-circle me-2"></i>Sobre o Jogo
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#contactModal">
-                        <i class="fas fa-envelope me-2"></i>Contato
-                    </a>
-                </li>
-            </ul>
-        </div>
     </nav>
 
+    <!-- Game Container -->
     <div class="game-container">
+        <!-- Street View -->
         <div id="street-view-container">
             <div id="street-view"></div>
-            <div id="street-view-marker" class="custom-marker" style="display: none;">
-                <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExcnc3a3lvcHFrN2ZwZTV2bnJzb3ZrYWJjeTl6ZXB4YzE0N3NkMHU3MyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/A5PYmtufdQIjD37IC0/giphy.gif" alt="Marker" style="width: 100%; height: 100%;">
-            </div>
             
+            <!-- Map Toggle Button -->
             <button class="map-toggle" id="mapToggle">
                 <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExbHdyenVlcDR4cXFydHVxb2Q1bW5ibmh1aHplcGFubzRvdWwyYmQydCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/PjTRytCVV9ROhgtEyI/giphy.gif" alt="Mapa" class="map-icon">
             </button>
         </div>
         
+        <!-- Map Container -->
         <div id="map-container">
             <div id="map"></div>
             
+            <!-- Confirm Button -->
             <div class="confirm-btn-container">
                 <button class="confirm-btn" id="confirmBtn">
                     <i class="fas fa-check-circle"></i> Confirmar Palpite
@@ -360,18 +313,21 @@
         </div>
     </div>
 
+    <!-- Rodapé -->
     <footer class="app-footer">
         <div class="container">
             <div class="social-icons">
                 © 2025 Gincaneiros:
                 <a href="https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}" id="share-facebook"><i class="fab fa-facebook"></i></a>
-                <!-- <a href="#" id="share-twitter"><i class="fab fa-twitter"></i></a> -->
+                <a href="#" id="share-twitter"><i class="fab fa-twitter"></i></a>
                 <a href="#" id="share-instagram"><i class="fab fa-instagram"></i></a>
                 <a href="https://wa.me/?text=${encodedText}%20${encodedUrl}" id="share-whatsapp"><i class="fab fa-whatsapp"></i></a>
             </div>
         </div>
     </footer>
 
+    <!-- Modais -->
+    <!-- Como Jogar -->
     <div class="modal fade" id="howToPlayModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -393,6 +349,7 @@
         </div>
     </div>
 
+    <!-- Sobre o Jogo -->
     <div class="modal fade" id="aboutModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -412,6 +369,7 @@
         </div>
     </div>
 
+    <!-- Contato -->
     <div class="modal fade" id="contactModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -431,7 +389,10 @@
         </div>
     </div>
 
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
@@ -445,6 +406,7 @@
         let currentGameLocations = [];
         let gameSeed = Math.floor(Math.random() * 1000000);
         
+        // Lista mínima de fallback (apenas como último recurso)
         const FALLBACK_LOCATIONS = [
             { lat: 40.7128, lng: -74.0060, name: "Nova York, EUA" },
             { lat: 48.8566, lng: 2.3522, name: "Paris, França" },
@@ -493,37 +455,22 @@
             { lat: 52.3702, lng: 4.8952, name: "Amsterdã, Holanda" },
         ];
 
-        setTimeout(showJohnHelpAlert, 1500);
-
-        function showJohnHelpAlert() {
-            Swal.fire({
-                title: "Onde Estou?",
-                text: "Ajude Jhon se encontrar no mapa.",
-                imageUrl: "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExcnc3a3lvcHFrN2ZwZTV2bnJzb3ZrYWJjeTl6ZXB4YzE0N3NkMHU3MyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/A5PYmtufdQIjD37IC0/giphy.gif",
-                imageWidth: 300,
-                imageHeight: 150,
-                imageAlt: "Cadê Jhon?",
-                confirmButtonText: "Vou ajudar!",
-                confirmButtonColor: "#007bff",
-            });
-        }
-
-        document.getElementById('mobile-menu-button').addEventListener('click', function() {
-                document.getElementById('mobile-menu').classList.toggle('hidden');
-            });
-
+        // Função para selecionar um fallback aleatório
         function getRandomFallback() {
             return FALLBACK_LOCATIONS[Math.floor(Math.random() * FALLBACK_LOCATIONS.length)];
         }
 
+        // Distribuição de latitudes mais inteligente
         function betterLatitudeDistribution() {
+            // Probabilidades ajustadas para áreas com mais Street View
             const r = Math.random();
-            if (r < 0.4) return Math.random() * 50 - 25;
-            if (r < 0.7) return Math.random() * 30 + 25;
-            if (r < 0.9) return Math.random() * 30 - 55;
-            return Math.random() * 170 - 85;
+            if (r < 0.4) return Math.random() * 50 - 25; // Zona temperada norte (25°N a 25°S)
+            if (r < 0.7) return Math.random() * 30 + 25; // Zona temperada norte (25°N a 55°N)
+            if (r < 0.9) return Math.random() * 30 - 55; // Zona temperada sul (25°S a 55°S)
+            return Math.random() * 170 - 85; // Qualquer lugar (incluindo polos)
         }
 
+        // Função para obter dados do Street View
         async function getPanoramaData(lat, lng, radius = 200000) {
             const streetViewService = new google.maps.StreetViewService();
             return new Promise((resolve, reject) => {
@@ -531,6 +478,8 @@
                     location: new google.maps.LatLng(lat, lng),
                     radius: radius,
                     source: google.maps.StreetViewSource.OUTDOOR,
+                   // source: google.maps.StreetViewSource.DEFAULT,
+                   // preference: google.maps.StreetViewPreference.BEST
                 }, (data, status) => {
                     if (status === 'OK') resolve(data);
                     else reject(status);
@@ -538,6 +487,7 @@
             });
         }
 
+        // Função auxiliar para obter nome da cidade
         async function getCityName(lat, lng) {
             try {
                 const geocoder = new google.maps.Geocoder();
@@ -551,6 +501,7 @@
                     });
                 });
                 
+                // Tenta obter o nome da cidade ou país
                 let city = "Local desconhecido";
                 for (const component of response.address_components) {
                     if (component.types.includes('locality')) {
@@ -568,12 +519,15 @@
             }
         }
 
+        // Função principal para obter localização aleatória
         async function getRandomLocation() {
-            const maxAttempts = 10;
+            const maxAttempts = 10; // Número aumentado de tentativas
             let attempts = 0;
-            let panoramaRadius = 200000;
+            let panoramaRadius = 200000; // Começa com raio grande (200km)
             
+            // Primeiro tenta encontrar um local totalmente aleatório
             while (attempts < maxAttempts) {
+                // Gera coordenadas com distribuição inteligente
                 const lat = betterLatitudeDistribution();
                 const lng = Math.random() * 360 - 180;
                 
@@ -591,19 +545,22 @@
                     };
                 } catch (error) {
                     attempts++;
+                    // Diminui o raio de busca progressivamente
                     if (attempts > 10) {
-                        panoramaRadius = 100000;
+                        panoramaRadius = 100000; // 100km
                     }
                     if (attempts > 15) {
-                        panoramaRadius = 50000;
+                        panoramaRadius = 50000; // 50km
                     }
                 }
             }
             
+            // Se não encontrar após muitas tentativas, usa um fallback mínimo
             console.log("Usando fallback após", maxAttempts, "tentativas");
             return getRandomFallback();
         }
 
+        // Função para compartilhar resultado
         function shareResult() {
             const shareText = `Acabei de jogar Gincaneiros e marquei ${score} pontos! Tente bater meu recorde! 🌍`;
             const shareUrl = window.location.href;
@@ -622,6 +579,7 @@
             }
         }
         
+        // Fallback para navegadores sem API de compartilhamento
         function showShareFallback(text, url) {
             const encodedText = encodeURIComponent(text);
             const encodedUrl = encodeURIComponent(url);
@@ -637,9 +595,9 @@
                         <a href="https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}" class="share-btn facebook" target="_blank">
                             <i class="fab fa-facebook-f"></i> Facebook
                         </a>
-                        // <a href="https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}" class="share-btn twitter" target="_blank">
-                        //     <i class="fab fa-twitter"></i> Twitter
-                        // </a>
+                        <a href="https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}" class="share-btn twitter" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
                         <a href="#" onclick="navigator.clipboard.writeText('${text} ' + '${url}'); Swal.fire('Link copiado!', 'Cole em qualquer lugar para compartilhar.', 'success'); return false;" class="share-btn link">
                             <i class="fas fa-link"></i> Copiar Link
                         </a>
@@ -650,46 +608,9 @@
             });
         }
 
-        function positionMarkerInStreetView() {
-            const markerElement = document.getElementById('street-view-marker');
-            markerElement.style.display = 'none';
-            
-            if (window.streetViewMarker) {
-                window.streetViewMarker.setMap(null);
-            }
-            
-            const panoramaPosition = panorama.getPosition();
-            const pov = panorama.getPov();
-
-            if (!panoramaPosition || !pov) {
-                console.error("Não foi possível obter a posição ou POV do panorama para o marcador.");
-                return;
-            }
-                
-            const heading = pov.heading;
-            const distance = 15;
-
-            const newPosition = google.maps.geometry.spherical.computeOffset(
-                panoramaPosition,
-                distance,
-                heading
-            );
-
-            window.streetViewMarker = new google.maps.Marker({
-                position: newPosition,
-                map: panorama,
-                icon: {
-                    url: 'https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExcnc3a3lvcHFrN2ZwZTV2bnJzb3ZrYWJjeTl6ZXB4YzE0N3NkMHU3MyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/A5PYmtufdQIjD37IC0/giphy.gif',
-                    scaledSize: new google.maps.Size(80, 120),
-                    anchor: new google.maps.Point(40, 120)
-                },
-                title: "Ponto de Interesse"
-            });
-
-            console.log("Marcador posicionado à frente da câmera em:", newPosition.toString());
-        }
-
+        // Funções principais
         async function initMap() {
+            // Configura o mapa
             map = new google.maps.Map(document.getElementById("map"), {
                 center: { lat: 0, lng: 0 },
                 zoom: 2,
@@ -701,19 +622,27 @@
                 zoomControl: false,
             });
 
+            // Configura os event listeners
             document.getElementById('mapToggle').addEventListener('click', toggleMap);
             document.getElementById('confirmBtn').addEventListener('click', confirmGuess);
             map.addListener("click", function(event) {
                 placeMarker(event.latLng);
             });
 
+            // Event listeners para compartilhamento no rodapé
             document.getElementById('share-facebook').addEventListener('click', function(e) {
                 e.preventDefault();
                 const url = encodeURIComponent(window.location.href);
                 window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
             });
             
-                    
+            document.getElementById('share-twitter').addEventListener('click', function(e) {
+                e.preventDefault();
+                const text = encodeURIComponent("Estou jogando Gincaneiros, um jogo incrível de geolocalização!");
+                const url = encodeURIComponent(window.location.href);
+                window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+            });
+            
             document.getElementById('share-instagram').addEventListener('click', function(e) {
                 e.preventDefault();
                 Swal.fire({
@@ -731,6 +660,7 @@
                 window.open(`https://wa.me/?text=${text}${url}`, '_blank');
             });
 
+            // Inicia o jogo
             await newRound();
         }
 
@@ -739,12 +669,15 @@
             const streetViewContainer = document.getElementById('street-view-container');
             
             if (mapContainer.classList.contains('show')) {
+                // Esconde o mapa e mostra Street View
                 mapContainer.classList.remove('show');
                 streetViewContainer.style.display = 'block';
             } else {
+                // Esconde Street View e mostra o mapa
                 streetViewContainer.style.display = 'none';
                 mapContainer.classList.add('show');
                 
+                // Centraliza o mapa se houver marcador
                 if (marker) {
                     map.setCenter(marker.getPosition());
                 }
@@ -752,6 +685,7 @@
         }
 
         async function newRound() {
+            // Garante que o mapa esteja fechado e Street View visível
             document.getElementById('map-container').classList.remove('show');
             document.getElementById('street-view-container').style.display = 'block';
 
@@ -760,6 +694,7 @@
                 return;
             }
             
+            // Obtém novo local
             correctLocation = await getRandomLocation();
             currentGameLocations.push({
                 lat: correctLocation.lat,
@@ -767,10 +702,11 @@
                 name: correctLocation.name
             });
             
+            // Configura o Street View
             panorama = new google.maps.StreetViewPanorama(
                 document.getElementById("street-view"), {
                     position: correctLocation,
-                    pov: { heading: Math.random() * 360, pitch: 5 },
+                    pov: { heading: Math.random() * 360, pitch: 0 },
                     zoom: 1,
                     disableDefaultUI: true,
                     showRoadLabels: false,
@@ -779,13 +715,8 @@
                     },
                 }
             );
-
-            // panorama.addListener('pano_changed', function() {
-            //     positionMarkerInStreetView();
-            // });
             
-            positionMarkerInStreetView();
-
+            // Remove marcador anterior
             if (marker) {
                 marker.setMap(null);
                 marker = null;
