@@ -330,7 +330,7 @@
                 <div class="modal-body">
                     <p>1. Você verá uma imagem do Google Street View</p>
                     <p>2. Tente adivinhar onde essa localização está no mapa</p>
-                    <p>3. Clique no botão de localização à direita</p>
+                    <p>3. Clique no botão de localização na direita</p>
                     <p>4. Marque seu palpite no mapa e confirme</p>
                     <p>5. Quanto mais perto do local real, mais pontos você ganha!</p>
                 </div>
@@ -349,9 +349,9 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>1. Gincaneiros é um jogo para quem gosta de descobrir locais aleatórios.</p>
-                    <p>2. Cada rodada mostra uma localização no mundo através do Google Street View.</p>
-                    <p>3. Seu objetivo é marcar no mapa onde você acha que essa localização está. Depois, desafiar seus amigos/familiares.</p>
+                    <p>Gincaneiros é um jogo de adivinhação de locais aleatórios.</p>
+                    <p>Cada rodada mostra uma localização no mundo através do Google Street View.</p>
+                    <p>Sua missão é marcar no mapa onde você acha que essa localização está e desafiar algum amigo/familiar.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Fechar</button>
@@ -370,7 +370,7 @@
                 <div class="modal-body">
                     <p>Dúvidas, sugestões ou problemas?</p>
                     <p>Entre em contato conosco:</p>
-                    <p><i class="fas fa-envelope me-2"></i> 53 98105.6952</p>
+                    <p><i class="fas fa-envelope me-2"></i> 53 981056952</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Fechar</button>
@@ -393,20 +393,55 @@
         let currentGameLocations = [];
         let gameSeed = Math.floor(Math.random() * 1000000);
         let brazilLocationsUsed = 0;
-        let usedLocations = []; // Cache de locais já usados
-        let lastLocationRegion = null; // Para garantir diversidade geográfica
+        
+        // Lista atualizada com locais turísticos e urbanos
+        const LOCATIONS = [
+            // Brasil (locais turísticos e urbanos)
+            { lat: -23.5505, lng: -46.6333, name: "Avenida Paulista, São Paulo, Brasil", tourist: true },
+            { lat: -22.9111, lng: -43.2054, name: "Praia de Copacabana, Rio de Janeiro, Brasil", tourist: true },
+            { lat: -15.7942, lng: -47.8825, name: "Eixo Monumental, Brasília, Brasil", tourist: true },
+            { lat: -12.9722, lng: -38.5014, name: "Pelourinho, Salvador, Brasil", tourist: true },
+            { lat: -3.7319, lng: -38.5267, name: "Praça do Ferreira, Fortaleza, Brasil", tourist: true },
+            { lat: -8.0631, lng: -34.8711, name: "Marco Zero, Recife, Brasil", tourist: true },
+            { lat: -25.4296, lng: -49.2719, name: "Rua das Flores, Curitiba, Brasil", tourist: true },
+            { lat: -30.0346, lng: -51.2177, name: "Mercado Público, Porto Alegre, Brasil", tourist: true },
+            { lat: -23.0056, lng: -43.4384, name: "Praia de Ipanema, Rio de Janeiro, Brasil", tourist: true },
+            { lat: -22.9519, lng: -43.2105, name: "Cristo Redentor, Rio de Janeiro, Brasil", tourist: true },
+            
+            // Internacionais (locais turísticos famosos)
+            { lat: 40.7128, lng: -74.0060, name: "Times Square, Nova York, EUA", tourist: true },
+            { lat: 48.8566, lng: 2.3522, name: "Torre Eiffel, Paris, França", tourist: true },
+            { lat: 35.6762, lng: 139.6503, name: "Shibuya Crossing, Tóquio, Japão", tourist: true },
+            { lat: 51.5074, lng: -0.1278, name: "Trafalgar Square, Londres, Reino Unido", tourist: true },
+            { lat: 41.9028, lng: 12.4964, name: "Coliseu, Roma, Itália", tourist: true },
+            { lat: 52.5200, lng: 13.4050, name: "Portão de Brandemburgo, Berlim, Alemanha", tourist: true },
+            { lat: 40.4168, lng: -3.7038, name: "Puerta del Sol, Madri, Espanha", tourist: true },
+            { lat: 41.3851, lng: 2.1734, name: "Las Ramblas, Barcelona, Espanha", tourist: true },
+            { lat: 37.7749, lng: -122.4194, name: "Golden Gate Bridge, São Francisco, EUA", tourist: true },
+            { lat: 34.1341, lng: -118.3215, name: "Hollywood Walk of Fame, Los Angeles, EUA", tourist: true },
+            
+            // Locais urbanos adicionais (não necessariamente turísticos)
+            { lat: -23.5337, lng: -46.6253, name: "Centro de São Paulo, Brasil" },
+            { lat: -22.9068, lng: -43.1729, name: "Centro do Rio de Janeiro, Brasil" },
+            { lat: -15.7934, lng: -47.8822, name: "Setor Comercial Sul, Brasília, Brasil" },
+            { lat: -12.9777, lng: -38.5016, name: "Comércio, Salvador, Brasil" },
+            { lat: 40.7306, lng: -73.9352, name: "Manhattan, Nova York, EUA" },
+            { lat: 48.8567, lng: 2.3515, name: "Centro de Paris, França" },
+            { lat: 35.6828, lng: 139.7594, name: "Centro de Tóquio, Japão" },
+            { lat: 51.5156, lng: -0.1181, name: "Centro de Londres, Reino Unido" }
+        ];
 
         setTimeout(showJohnHelpAlert, 1500);
 
         function showJohnHelpAlert() {
             Swal.fire({
                 title: "Onde Estou?",
-                text: "Ajude Jhon a encontrar-se no mapa.",
+                text: "Ajude Jhon encontrar-se no mapa.",
                 imageUrl: "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExcnc3a3lvcHFrN2ZwZTV2bnJzb3ZrYWJjeTl6ZXB4YzE0N3NkMHU3MyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/A5PYmtufdQIjD37IC0/giphy.gif",
                 imageWidth: 300,
                 imageHeight: 150,
                 imageAlt: "Cadê Jhon?",
-                confirmButtonText: "Ok, vou tentar!",
+                confirmButtonText: "ok. Vamos tentar",
                 confirmButtonColor: "#007bff",
             });
         }
@@ -415,36 +450,12 @@
             document.getElementById('mobile-menu').classList.toggle('hidden');
         });
 
-        function getRandomRegion() {
-            // Gera coordenadas em diferentes regiões do mundo
-            const regions = [
-                { latRange: [-35, 35], lngRange: [-180, -30] }, // Américas
-                { latRange: [-35, 35], lngRange: [-30, 60] },   // África/Europa
-                { latRange: [-35, 35], lngRange: [60, 180] },   // Ásia/Oceania
-                { latRange: [35, 70], lngRange: [-10, 40] },    // Europa do Norte
-                { latRange: [-60, -20], lngRange: [-80, -30] }  // Cone Sul
-            ];
-            
-            // Evita repetir a mesma região consecutivamente
-            let region;
-            do {
-                region = regions[Math.floor(Math.random() * regions.length)];
-            } while (region === lastLocationRegion && Math.random() > 0.3);
-            
-            lastLocationRegion = region;
-            
-            const lat = region.latRange[0] + Math.random() * (region.latRange[1] - region.latRange[0]);
-            const lng = region.lngRange[0] + Math.random() * (region.lngRange[1] - region.lngRange[0]);
-            
-            return { lat, lng };
-        }
-
-        function isLocationUsed(lat, lng) {
-            // Verifica se o local já foi usado (com uma margem de erro)
-            return usedLocations.some(loc => 
-                Math.abs(loc.lat - lat) < 0.1 && 
-                Math.abs(loc.lng - lng) < 0.1
-            );
+        function betterLatitudeDistribution() {
+            const r = Math.random();
+            // Prioriza latitudes onde estão as maiores cidades do mundo
+            if (r < 0.7) return Math.random() * 50 - 20;  // Entre -20° e +30° (maioria das grandes cidades)
+            if (r < 0.9) return Math.random() * 30 - 50;  // Algumas cidades do sul
+            return Math.random() * 170 - 85;              // Raro
         }
 
         async function getPanoramaData(lat, lng, radius = 50000) {
@@ -457,27 +468,20 @@
                     preference: google.maps.StreetViewPreference.BEST
                 }, (data, status) => {
                     if (status === 'OK') {
-                        // Filtros rigorosos para garantir locais identificáveis
-                        const isGoodLocation = data.location && 
-                            data.location.description &&
-                            !data.location.description.includes("Indoor") &&
-                            !data.location.description.includes("Museum") &&
-                            !data.location.description.includes("Shopping") &&
-                            !data.location.description.includes("Airport") &&
-                            !data.location.description.includes("Station") &&
-                            (data.location.description.includes("Av.") ||
-                             data.location.description.includes("Rua") ||
-                             data.location.description.includes("Avenida") ||
-                             data.location.description.includes("Praça") ||
-                             data.location.description.includes("Street") ||
-                             data.location.description.includes("Avenue") ||
-                             data.location.description.includes("Road") ||
-                             data.location.description.includes(","));
+                        // Filtro rigoroso para áreas urbanas
+                        const isUrban = data.location && 
+                                       data.location.description && 
+                                       (data.location.description.includes("Av.") ||
+                                        data.location.description.includes("Rua") ||
+                                        data.location.description.includes("Avenida") ||
+                                        data.location.description.includes("Praça") ||
+                                        data.location.description.includes("Centro") ||
+                                        data.location.description.includes(","));
                         
-                        if (isGoodLocation && !isLocationUsed(data.location.latLng.lat(), data.location.latLng.lng())) {
+                        if (isUrban) {
                             resolve(data);
                         } else {
-                            reject(isGoodLocation ? "Local já usado" : "Área não adequada");
+                            reject("Área não urbana");
                         }
                     } else {
                         reject(status);
@@ -503,33 +507,24 @@
                 let country = "";
                 let address = response.formatted_address || "";
                 
-                // Extrai informações do endereço
                 for (const component of response.address_components) {
                     if (component.types.includes('locality')) {
                         city = component.long_name;
-                    } else if (component.types.includes('sublocality')) {
-                        city = component.long_name;
-                    } else if (component.types.includes('administrative_area_level_2')) {
-                        if (!city) city = component.long_name;
-                    } else if (component.types.includes('administrative_area_level_1')) {
-                        if (!city) city = component.long_name;
-                    } else if (component.types.includes('country')) {
+                    }
+                    if (component.types.includes('country')) {
                         country = component.long_name;
                     }
                 }
                 
-                // Tenta criar um nome significativo
                 if (city && country) {
                     return `${city}, ${country}`;
-                } else if (city) {
-                    return city;
                 } else if (country) {
                     return country;
                 } else if (address) {
-                    // Pega os dois primeiros elementos do endereço
+                    // Se não encontrar cidade, retorna os primeiros elementos do endereço
                     return address.split(",").slice(0, 2).join(",").trim();
                 } else {
-                    // Último recurso - coordenadas
+                    // Se não conseguir nenhuma informação, retorna as coordenadas
                     return `Local (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
                 }
             } catch (error) {
@@ -539,23 +534,48 @@
         }
 
         async function getRandomLocation() {
-            const maxAttempts = 20;
+            const maxAttempts = 15;
             let attempts = 0;
             
+            // Garante que pelo menos um local turístico seja incluído no jogo
+            const needsTouristLocation = !currentGameLocations.some(loc => 
+                LOCATIONS.some(touristLoc => 
+                    touristLoc.tourist && 
+                    touristLoc.lat === loc.lat && 
+                    touristLoc.lng === loc.lng
+                )
+            ) && roundsPlayed < (maxRounds - 1);
+            
             const needsBrazilLocation = brazilLocationsUsed < 2 && roundsPlayed < (maxRounds - 2);
+            
+            // Se precisamos de um local turístico, pegue um aleatório da lista
+            if (needsTouristLocation) {
+                const touristLocations = LOCATIONS.filter(loc => loc.tourist);
+                if (touristLocations.length > 0) {
+                    const selected = touristLocations[Math.floor(Math.random() * touristLocations.length)];
+                    
+                    if (selected.name.includes("Brasil")) {
+                        brazilLocationsUsed++;
+                    }
+                    
+                    return {
+                        lat: selected.lat,
+                        lng: selected.lng,
+                        name: selected.name
+                    };
+                }
+            }
             
             while (attempts < maxAttempts) {
                 let lat, lng;
                 
                 if (needsBrazilLocation) {
-                    // Gera coordenadas dentro do Brasil
-                    lat = -33 + Math.random() * 26; // Entre -33° e -7°
-                    lng = -74 + Math.random() * 39; // Entre -74° e -35°
+                    // Coordenadas de centros urbanos brasileiros
+                    lat = -15 + (Math.random() * 20);
+                    lng = -50 + (Math.random() * 30);
                 } else {
-                    // Gera coordenadas em regiões variadas do mundo
-                    const region = getRandomRegion();
-                    lat = region.lat;
-                    lng = region.lng;
+                    lat = betterLatitudeDistribution();
+                    lng = Math.random() * 360 - 180;
                 }
                 
                 try {
@@ -565,18 +585,7 @@
                         panoramaData.location.latLng.lng()
                     );
                     
-                    // Adiciona ao cache de locais usados
-                    usedLocations.push({
-                        lat: panoramaData.location.latLng.lat(),
-                        lng: panoramaData.location.latLng.lng()
-                    });
-                    
-                    // Limita o cache para não crescer indefinidamente
-                    if (usedLocations.length > 50) {
-                        usedLocations.shift();
-                    }
-                    
-                    if (locationName.includes("Brasil") || locationName.includes("Brazil")) {
+                    if (locationName.includes("Brasil")) {
                         brazilLocationsUsed++;
                     }
                     
@@ -591,13 +600,30 @@
                 }
             }
             
-            // Fallback extremo - coordenadas aleatórias (muito raro chegar aqui)
-            console.warn("Usando fallback de localização aleatória após", maxAttempts, "tentativas");
-            const fallbackCoords = getRandomRegion();
+            // Fallback para locais da lista pré-definida
+            const filteredLocations = needsBrazilLocation 
+                ? LOCATIONS.filter(loc => loc.name.includes("Brasil"))
+                : LOCATIONS;
+                
+            if (filteredLocations.length > 0) {
+                const selected = filteredLocations[Math.floor(Math.random() * filteredLocations.length)];
+                
+                if (selected.name.includes("Brasil")) {
+                    brazilLocationsUsed++;
+                }
+                
+                return {
+                    lat: selected.lat,
+                    lng: selected.lng,
+                    name: selected.name
+                };
+            }
+            
+            // Último fallback - coordenadas aleatórias
             return {
-                lat: fallbackCoords.lat,
-                lng: fallbackCoords.lng,
-                name: `Local (${fallbackCoords.lat.toFixed(4)}, ${fallbackCoords.lng.toFixed(4)})`
+                lat: betterLatitudeDistribution(),
+                lng: Math.random() * 360 - 180,
+                name: `Local (${betterLatitudeDistribution().toFixed(4)}, ${(Math.random() * 360 - 180).toFixed(4)})`
             };
         }
 
@@ -820,7 +846,7 @@
             Swal.fire({
                 title: distance < 10 ? 'Incrível! Quase exato!' : 
                       distance < 100 ? 'Muito bom!' : 
-                      distance < 300 ? 'Boa tentativa!' : 'Continue tentando!',
+                      distance < 500 ? 'Boa tentativa!' : 'Tente novamente!',
                 html: `
                     <div style="text-align: left;">
                         <p><b>Rodada:</b> ${roundsPlayed}/${maxRounds}</p>
@@ -829,10 +855,10 @@
                         <p><b>Pontos ganhos:</b> ${Math.round(points)}</p>
                     </div>
                 `,
-                icon: distance < 10 ? 'success' : 
-                     distance < 100 ? 'success' : 
-                     distance < 300 ? 'info' : 'error',
-                confirmButtonText: 'Próximo local',
+                icon: distance < 100 ? 'success' : 
+                     distance < 1000 ? 'success' : 
+                     distance < 10000 ? 'info' : 'error',
+                confirmButtonText: 'Próximo Local',
                 confirmButtonColor: '#007bff'
             }).then(() => {
                 newRound();
