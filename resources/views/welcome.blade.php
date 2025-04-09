@@ -280,24 +280,24 @@
         }
 
         #stateMenu {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    z-index: 1001;
-    max-height: 300px;
-    overflow-y: auto;
-    width: 200px;
-}
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        z-index: 1001;
+        max-height: 300px;
+        overflow-y: auto;
+        width: 200px;
+    }
 
-#stateMenu div {
-    padding: 8px 12px;
-    cursor: pointer;
-    border-bottom: 1px solid #eee;
-}
+    #stateMenu div {
+        padding: 8px 12px;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+    }
 
 #stateMenu div:hover {
     background: #f5f5f5;
@@ -592,8 +592,26 @@
                 const stateCenters = {
                     'AC': {lat: -9.11, lng: -70.52},
                     'AL': {lat: -9.57, lng: -36.55},
-                    // Adicione coordenadas aproximadas para todos os estados...
-                    'SP': {lat: -23.55, lng: -46.63} // Exemplo: São Paulo
+                    'AP': {lat: 1.41, lng: -51.77},
+                    'AM': {lat: -3.07, lng: -61.66},
+                    'BA': {lat: -12.96, lng: -38.51},
+                    'CE': {lat: -3.71, lng: -38.54},
+                    'DF': {lat: -15.83, lng: -47.86},
+                    'ES': {lat: -19.18, lng: -40.34},
+                    'GO': {lat: -16.64, lng: -49.31},
+                    'MA': {lat: -5.43, lng: -47.52},
+                    'MT': {lat: -12.64, lng: -55.42},
+                    'MS': {lat: -20.51, lng: -54.54},
+                    'MG': {lat: -18.10, lng: -44.38},
+                    'PA': {lat: -5.53, lng: -52.29},
+                    'PB': {lat: -7.06, lng: -35.55},
+                    'PR': {lat: -25.43, lng: -49.27},
+                    'PE': {lat: -8.28, lng: -35.07},
+                    'PI': {lat: -8.28, lng: -43.68},
+                    'RJ': {lat: -22.91, lng: -43.21},
+                    'RN': {lat: -5.22, lng: -36.52},
+                    'RS': {lat: -30.02, lng: -53.10},
+                    'SP': {lat: -23.55, lng: -46.63},
                 };
                 
                 const center = stateCenters[stateCode] || {lat: -15.78, lng: -47.93}; // Fallback: Brasília
@@ -972,8 +990,9 @@
             }
 
             map = new google.maps.Map(document.getElementById("map"), {
-                center: { lat: 0, lng: 0 },
-                zoom: 2,
+                //center: { lat: 0, lng: 0 },
+                center: { lat: -14.2350, lng: -51.9253 }, // centro aproximado do Brasil
+                zoom: 5,
                 disableDefaultUI: true,
                 streetViewControl: false,
                 gestureHandling: "greedy",
