@@ -278,6 +278,30 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             margin-top: 10px;
         }
+
+        #stateMenu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    z-index: 1001;
+    max-height: 300px;
+    overflow-y: auto;
+    width: 200px;
+}
+
+#stateMenu div {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+#stateMenu div:hover {
+    background: #f5f5f5;
+}
     </style>
 </head>
 <body class="bg-gray-100 pt-16">
@@ -326,7 +350,8 @@
     </nav>
 
     <div class="game-mode-selector">
-        <button class="game-mode-btn active" id="stateMode" onclick="setGameMode('state')">Estado</button>
+        <!-- <button class="game-mode-btn active" id="stateMode" onclick="setGameMode('state')">Estado</button> -->
+        <button class="game-mode-btn active" id="stateMode" onclick="showStateMenu()">Estado</button>
         <button class="game-mode-btn" id="brazilMode" onclick="setGameMode('brazil')">Brasil</button>
         <button class="game-mode-btn" id="worldMode" onclick="setGameMode('world')">Mundo</button>
     </div>
@@ -477,59 +502,161 @@
             resetGame();
         }
 
-        async function detectUserLocation() {
-            return new Promise((resolve, reject) => {
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        async (position) => {
-                            const lat = position.coords.latitude;
-                            const lng = position.coords.longitude;
-                            
-                            // Usar Geocoding para obter o estado do usuário
-                            try {
-                                const geocoder = new google.maps.Geocoder();
-                                const response = await new Promise((resolve, reject) => {
-                                    geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-                                        if (status === 'OK' && results[0]) {
-                                            resolve(results[0]);
-                                        } else {
-                                            reject(status);
-                                        }
+            // Lista de todos os estados brasileiros
+            const brazilianStates = [
+                {name: "Acre", code: "AC"},
+                {name: "Alagoas", code: "AL"},
+                {name: "Amapá", code: "AP"},
+                {name: "Amazonas", code: "AM"},
+                {name: "Bahia", code: "BA"},
+                {name: "Ceará", code: "CE"},
+                {name: "Distrito Federal", code: "DF"},
+                {name: "Espírito Santo", code: "ES"},
+                {name: "Goiás", code: "GO"},
+                {name: "Maranhão", code: "MA"},
+                {name: "Mato Grosso", code: "MT"},
+                {name: "Mato Grosso do Sul", code: "MS"},
+                {name: "Minas Gerais", code: "MG"},
+                {name: "Pará", code: "PA"},
+                {name: "Paraíba", code: "PB"},
+                {name: "Paraná", code: "PR"},
+                {name: "Pernambuco", code: "PE"},
+                {name: "Piauí", code: "PI"},
+                {name: "Rio de Janeiro", code: "RJ"},
+                {name: "Rio Grande do Norte", code: "RN"},
+                {name: "Rio Grande do Sul", code: "RS"},
+                {name: "Rondônia", code: "RO"},
+                {name: "Roraima", code: "RR"},
+                {name: "Santa Catarina", code: "SC"},
+                {name: "São Paulo", code: "SP"},
+                {name: "Sergipe", code: "SE"},
+                {name: "Tocantins", code: "TO"}
+            ];
+
+            // Função para mostrar o menu de estados
+            function showStateMenu() {
+                const menuHtml = `
+                    <div id="stateMenu" style="position: absolute; top: 100%; left: 0; background: white; 
+                        border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                        z-index: 1001; max-height: 300px; overflow-y: auto; width: 200px;">
+                        ${brazilianStates.map(state => `
+                            <div style="padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #eee;
+                                &:hover { background: #f5f5f5; }"
+                                onclick="selectState('${state.name}', '${state.code}')">
+                                ${state.name}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                // Remove menu existente se houver
+                const existingMenu = document.getElementById('stateMenu');
+                if (existingMenu) existingMenu.remove();
+                
+                // Adiciona novo menu
+                const stateButton = document.getElementById('stateMode');
+                stateButton.insertAdjacentHTML('afterend', menuHtml);
+                
+                // Fecha o menu ao clicar fora
+                setTimeout(() => {
+                    document.addEventListener('click', closeStateMenu);
+                }, 100);
+            }
+            
+            function closeStateMenu(e) {
+                const stateMenu = document.getElementById('stateMenu');
+                const stateButton = document.getElementById('stateMode');
+                
+                if (stateMenu && e.target !== stateButton && !stateButton.contains(e.target)) {
+                    stateMenu.remove();
+                    document.removeEventListener('click', closeStateMenu);
+                }
+            }
+            
+            function selectState(stateName, stateCode) {
+                userState = stateName;
+                document.getElementById('stateMode').textContent = stateName;
+                document.getElementById('stateMenu').remove();
+                
+                // Define os limites aproximados do estado (simplificado)
+                // Na prática, você precisaria de coordenadas exatas para cada estado
+                setStateBounds(stateCode);
+                
+                // Reinicia o jogo com o novo estado
+                resetGame();
+            }
+            
+            // Função simplificada para definir os limites do estado
+            function setStateBounds(stateCode) {
+                // Centraliza no estado com um raio de ~100km
+                const stateCenters = {
+                    'AC': {lat: -9.11, lng: -70.52},
+                    'AL': {lat: -9.57, lng: -36.55},
+                    // Adicione coordenadas aproximadas para todos os estados...
+                    'SP': {lat: -23.55, lng: -46.63} // Exemplo: São Paulo
+                };
+                
+                const center = stateCenters[stateCode] || {lat: -15.78, lng: -47.93}; // Fallback: Brasília
+                stateBounds = new google.maps.LatLngBounds(
+                    new google.maps.LatLng(center.lat - 1, center.lng - 1), // ~100km
+                    new google.maps.LatLng(center.lat + 1, center.lng + 1)
+                );
+            }
+
+         // Modificação da função detectUserLocation para usar raio de 100km
+            async function detectUserLocation() {
+                return new Promise((resolve, reject) => {
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(
+                            async (position) => {
+                                const lat = position.coords.latitude;
+                                const lng = position.coords.longitude;
+                                
+                                try {
+                                    const geocoder = new google.maps.Geocoder();
+                                    const response = await new Promise((resolve, reject) => {
+                                        geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+                                            if (status === 'OK' && results[0]) {
+                                                resolve(results[0]);
+                                            } else {
+                                                reject(status);
+                                            }
+                                        });
                                     });
-                                });
-                                
-                                // Encontrar o componente de estado no endereço
-                                for (const component of response.address_components) {
-                                    if (component.types.includes('administrative_area_level_1')) {
-                                        userState = component.long_name;
-                                        
-                                        // Obter os limites aproximados do estado
-                                        const bounds = new google.maps.LatLngBounds();
-                                        bounds.extend(new google.maps.LatLng(lat - 2, lng - 2));
-                                        bounds.extend(new google.maps.LatLng(lat + 2, lng + 2));
-                                        stateBounds = bounds;
-                                        
-                                        resolve({ lat, lng, state: userState });
-                                        return;
+                                    
+                                    // Encontrar a cidade e estado
+                                    let city, state;
+                                    for (const component of response.address_components) {
+                                        if (component.types.includes('locality')) {
+                                            city = component.long_name;
+                                        } else if (component.types.includes('administrative_area_level_1')) {
+                                            state = component.long_name;
+                                            userState = state;
+                                        }
                                     }
+                                    
+                                    // Definir raio de 100km ao redor da cidade
+                                    stateBounds = new google.maps.LatLngBounds();
+                                    const radius = 100 / 111.32; // Graus aproximados para 100km
+                                    stateBounds.extend(new google.maps.LatLng(lat - radius, lng - radius));
+                                    stateBounds.extend(new google.maps.LatLng(lat + radius, lng + radius));
+                                    
+                                    resolve({ lat, lng, city, state });
+                                } catch (error) {
+                                    console.error("Erro ao geocodificar:", error);
+                                    reject(error);
                                 }
-                                
-                                reject("Estado não encontrado");
-                            } catch (error) {
-                                console.error("Erro ao geocodificar:", error);
+                            },
+                            (error) => {
+                                console.error("Erro ao obter localização:", error);
                                 reject(error);
                             }
-                        },
-                        (error) => {
-                            console.error("Erro ao obter localização:", error);
-                            reject(error);
-                        }
-                    );
-                } else {
-                    reject("Geolocalização não suportada");
-                }
-            });
-        }
+                        );
+                    } else {
+                        reject("Geolocalização não suportada");
+                    }
+                });
+            }
 
         function getRandomStateLocation() {
             if (!stateBounds) {
