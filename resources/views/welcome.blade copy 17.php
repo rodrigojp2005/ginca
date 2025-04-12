@@ -13,8 +13,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css">
-
 
     <style>
         :root {
@@ -468,10 +466,10 @@
             <i class="fas fa-map-marker-alt mr-1"></i> Estado
         </button>
         <button class="game-mode-btn" id="brazilMode" onclick="setGameMode('brazil')">
-            <i class="flag-icon flag-icon-br mr-1"></i> Brasil
+            <i class="fas fa-globe-americas mr-1"></i> Brasil
         </button>
         <button class="game-mode-btn" id="worldMode" onclick="setGameMode('world')">
-            <i class="fas fa-globe-americas mr-1"></i> Mundo
+            <i class="fas fa-globe mr-1"></i> Mundo
         </button>
     </div>
 
@@ -479,7 +477,7 @@
     <div class="game-container">
         <!-- Round Indicator -->
         <div class="round-indicator">
-            <!-- <i class="fas fa-map-pin mr-1"></i> -->
+            <i class="fas fa-map-pin mr-1"></i>
             <span id="roundCounter">1/5</span>
         </div>
 
@@ -538,7 +536,8 @@
         let roundsPlayed = 0;
         const maxRounds = 5;
         let currentGameLocations = [];
-        let gameSeed = Math.floor(Math.random() * 1000000);
+        //let gameSeed = Math.floor(Math.random() * 1000000);
+        let gameSeed = Math.floor(Math.random() * 1000000) + Date.now() % 1000000;
         let usedLocations = [];
         let lastLocationRegion = null;
         let gameMode = 'state';
@@ -867,7 +866,7 @@
                                 
                                 // Set ~100km radius around the city
                                 stateBounds = new google.maps.LatLngBounds();
-                                const radius = 50 / 111.32; // Approximate degrees for 100km
+                                const radius = 25 / 111.32; // Approximate degrees for 100km
                                 stateBounds.extend(new google.maps.LatLng(lat - radius, lng - radius));
                                 stateBounds.extend(new google.maps.LatLng(lat + radius, lng + radius));
                                 
@@ -1170,167 +1169,6 @@
                 gestureHandling: "greedy",
                 fullscreenControl: false,
                 mapTypeControl: false,
-                zoomControl: false,
-                // styles: [
-                //     {
-                //         "elementType": "geometry",
-                //         "stylers": [
-                //             {
-                //                 "color": "#f5f5f5"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         "elementType": "labels.icon",
-                //         "stylers": [
-                //             {
-                //                 "visibility": "off"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         "elementType": "labels.text.fill",
-                //         "stylers": [
-                //             {
-                //                 "color": "#616161"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         "elementType": "labels.text.stroke",
-                //         "stylers": [
-                //             {
-                //                 "color": "#f5f5f5"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         "featureType": "administrative.land_parcel",
-                //         "elementType": "labels.text.fill",
-                //         "stylers": [
-                //             {
-                //                 "color": "#bdbdbd"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         "featureType": "poi",
-                //         "elementType": "geometry",
-                //         "stylers": [
-                //             {
-                //                 "color": "#eeeeee"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         "featureType": "poi",
-                //         "elementType": "labels.text.fill",
-                //         "stylers": [
-                //             {
-                //                 "color": "#757575"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         "featureType": "poi.park",
-                //         "elementType": "geometry",
-                //         "stylers": [
-                //             {
-                //                 "color": "#e5e5e5"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         "featureType": "poi.park",
-                //         "elementType": "labels.text.fill",
-                //         "stylers": [
-                //             {
-                //                 "color": "#9e9e9e"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         "featureType": "road",
-                //         "elementType": "geometry",
-                //         "stylers": [
-                //             {
-                //                 "color": "#ffffff"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         "featureType": "road.arterial",
-                //         "elementType": "labels.text.fill",
-                //         "stylers": [
-                //             {
-                //                 "color": "#757575"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         "featureType": "road.highway",
-                //         "elementType": "geometry",
-                //         "stylers": [
-                //             {
-                //                 "color": "#dadada"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         "featureType": "road.highway",
-                //         "elementType": "labels.text.fill",
-                //         "stylers": [
-                //             {
-                //                 "color": "#616161"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         "featureType": "road.local",
-                //         "elementType": "labels.text.fill",
-                //         "stylers": [
-                //             {
-                //                 "color": "#9e9e9e"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         "featureType": "transit.line",
-                //         "elementType": "geometry",
-                //         "stylers": [
-                //             {
-                //                 "color": "#e5e5e5"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         "featureType": "transit.station",
-                //         "elementType": "geometry",
-                //         "stylers": [
-                //             {
-                //                 "color": "#eeeeee"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         "featureType": "water",
-                //         "elementType": "geometry",
-                //         "stylers": [
-                //             {
-                //                 "color": "#c9c9c9"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         "featureType": "water",
-                //         "elementType": "labels.text.fill",
-                //         "stylers": [
-                //             {
-                //                 "color": "#9e9e9e"
-                //             }
-                //         ]
-                //     }
-                // ]
             });
             
             // Add click listener for placing markers
@@ -1392,11 +1230,10 @@
                     disableDefaultUI: true,
                     showRoadLabels: false,
                     // desabiilitar controlle do zoom
-                    zoomControl: true,
-                     zoomControlOptions: {
-                        // posicionar no meio na esquerda da tela
-                        position: google.maps.ControlPosition.LEFT_BOTTOM,
-                     },
+                    zoomControl: false,
+                    // zoomControlOptions: {
+                    //     position: google.maps.ControlPosition.TOP_LEFT,
+                    // },
                     motionTracking: false
                 }
             );
@@ -1500,80 +1337,78 @@
                 icon: icon,
                 confirmButtonText: 'Próximo local',
                 confirmButtonColor: '#3B82F6',
-               // showCancelButton: true,
-               // cancelButtonText: 'Ver no mapa',
+                showCancelButton: true,
+                cancelButtonText: 'Ver no mapa',
                 cancelButtonColor: '#6B7280'
             }).then((result) => {
                 roundsPlayed++;
                 
                 if (result.isConfirmed) {
                     newRound();
-                } 
-                //else if (result.dismiss === Swal.DismissReason.cancel) {
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
                     // Show both locations on map
-                    //showBothLocations(guessedLocation);
-                //} 
-                else {
+                    showBothLocations(guessedLocation);
+                } else {
                     newRound();
                 }
             });
         }
 
-        // function showBothLocations(guessedLocation) {
-        //     // Clear existing markers
-        //     if (marker) marker.setMap(null);
+        function showBothLocations(guessedLocation) {
+            // Clear existing markers
+            if (marker) marker.setMap(null);
             
-        //     // Add correct location marker
-        //     new google.maps.Marker({
-        //         position: correctLocation,
-        //         map: map,
-        //         icon: {
-        //             url: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',
-        //             scaledSize: new google.maps.Size(32, 32)
-        //         },
-        //         title: "Local Correto"
-        //     });
+            // Add correct location marker
+            new google.maps.Marker({
+                position: correctLocation,
+                map: map,
+                icon: {
+                    url: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',
+                    scaledSize: new google.maps.Size(32, 32)
+                },
+                title: "Local Correto"
+            });
             
-        //     // Add guessed location marker
-        //     new google.maps.Marker({
-        //         position: guessedLocation,
-        //         map: map,
-        //         icon: {
-        //             url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
-        //             scaledSize: new google.maps.Size(32, 32)
-        //         },
-        //         title: "Seu Palpite"
-        //     });
+            // Add guessed location marker
+            new google.maps.Marker({
+                position: guessedLocation,
+                map: map,
+                icon: {
+                    url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
+                    scaledSize: new google.maps.Size(32, 32)
+                },
+                title: "Seu Palpite"
+            });
             
-        //     // Add line between markers
-        //     new google.maps.Polyline({
-        //         path: [guessedLocation, correctLocation],
-        //         geodesic: true,
-        //         strokeColor: '#3B82F6',
-        //         strokeOpacity: 0.7,
-        //         strokeWeight: 3,
-        //         map: map
-        //     });
+            // Add line between markers
+            new google.maps.Polyline({
+                path: [guessedLocation, correctLocation],
+                geodesic: true,
+                strokeColor: '#3B82F6',
+                strokeOpacity: 0.7,
+                strokeWeight: 3,
+                map: map
+            });
             
-        //     // Fit bounds to show both locations
-        //     const bounds = new google.maps.LatLngBounds();
-        //     bounds.extend(guessedLocation);
-        //     bounds.extend(correctLocation);
-        //     map.fitBounds(bounds);
+            // Fit bounds to show both locations
+            const bounds = new google.maps.LatLngBounds();
+            bounds.extend(guessedLocation);
+            bounds.extend(correctLocation);
+            map.fitBounds(bounds);
             
-        //     // Show map
-        //     document.getElementById('street-view-container').style.display = 'none';
-        //     document.getElementById('map-container').classList.add('show');
+            // Show map
+            document.getElementById('street-view-container').style.display = 'none';
+            document.getElementById('map-container').classList.add('show');
             
-        //     // Change confirm button to continue
-        //     const confirmBtn = document.getElementById('confirmBtn');
-        //     confirmBtn.innerHTML = '<i class="fas fa-arrow-right mr-1"></i> Continuar';
-        //     confirmBtn.onclick = () => {
-        //         confirmBtn.innerHTML = '<i class="fas fa-check-circle mr-1"></i> Confirmar Palpite';
-        //         confirmBtn.onclick = confirmGuess;
-        //         newRound();
-        //     };
-        // }
+            // Change confirm button to continue
+            const confirmBtn = document.getElementById('confirmBtn');
+            confirmBtn.innerHTML = '<i class="fas fa-arrow-right mr-1"></i> Continuar';
+            confirmBtn.onclick = () => {
+                confirmBtn.innerHTML = '<i class="fas fa-check-circle mr-1"></i> Confirmar Palpite';
+                confirmBtn.onclick = confirmGuess;
+                newRound();
+            };
+        }
 
         function endGame() {
             // Calculate performance rating
@@ -1716,24 +1551,6 @@
             window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
         }
 
-        // function logout() {
-        //     // Implement your logout logic here
-        //     Swal.fire({
-        //         title: 'Sair',
-        //         text: 'Tem certeza que deseja sair do jogo?',
-        //         icon: 'question',
-        //         showCancelButton: true,
-        //         confirmButtonColor: '#3B82F6',
-        //         cancelButtonColor: '#6B7280',
-        //         confirmButtonText: 'Sim, sair',
-        //         cancelButtonText: 'Cancelar'
-        //     }).then((result) => {
-        //         if (result.isConfirmed) {
-        //             // Redirect to home or login page
-        //             window.location.href = '/';
-        //         }
-        //     });
-        // }
     </script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3VgDsnZQDKV1w4TM-D19msn3TgOOMuzk&libraries=geometry,streetView&callback=initMap"></script>
 </body>

@@ -13,8 +13,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css">
-
 
     <style>
         :root {
@@ -468,10 +466,10 @@
             <i class="fas fa-map-marker-alt mr-1"></i> Estado
         </button>
         <button class="game-mode-btn" id="brazilMode" onclick="setGameMode('brazil')">
-            <i class="flag-icon flag-icon-br mr-1"></i> Brasil
+            <i class="fas fa-globe-americas mr-1"></i> Brasil
         </button>
         <button class="game-mode-btn" id="worldMode" onclick="setGameMode('world')">
-            <i class="fas fa-globe-americas mr-1"></i> Mundo
+            <i class="fas fa-globe mr-1"></i> Mundo
         </button>
     </div>
 
@@ -479,7 +477,7 @@
     <div class="game-container">
         <!-- Round Indicator -->
         <div class="round-indicator">
-            <!-- <i class="fas fa-map-pin mr-1"></i> -->
+            <i class="fas fa-map-pin mr-1"></i>
             <span id="roundCounter">1/5</span>
         </div>
 
@@ -1392,11 +1390,10 @@
                     disableDefaultUI: true,
                     showRoadLabels: false,
                     // desabiilitar controlle do zoom
-                    zoomControl: true,
-                     zoomControlOptions: {
-                        // posicionar no meio na esquerda da tela
-                        position: google.maps.ControlPosition.LEFT_BOTTOM,
-                     },
+                    zoomControl: false,
+                    // zoomControlOptions: {
+                    //     position: google.maps.ControlPosition.TOP_LEFT,
+                    // },
                     motionTracking: false
                 }
             );
@@ -1500,80 +1497,78 @@
                 icon: icon,
                 confirmButtonText: 'Próximo local',
                 confirmButtonColor: '#3B82F6',
-               // showCancelButton: true,
-               // cancelButtonText: 'Ver no mapa',
+                showCancelButton: true,
+                cancelButtonText: 'Ver no mapa',
                 cancelButtonColor: '#6B7280'
             }).then((result) => {
                 roundsPlayed++;
                 
                 if (result.isConfirmed) {
                     newRound();
-                } 
-                //else if (result.dismiss === Swal.DismissReason.cancel) {
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
                     // Show both locations on map
-                    //showBothLocations(guessedLocation);
-                //} 
-                else {
+                    showBothLocations(guessedLocation);
+                } else {
                     newRound();
                 }
             });
         }
 
-        // function showBothLocations(guessedLocation) {
-        //     // Clear existing markers
-        //     if (marker) marker.setMap(null);
+        function showBothLocations(guessedLocation) {
+            // Clear existing markers
+            if (marker) marker.setMap(null);
             
-        //     // Add correct location marker
-        //     new google.maps.Marker({
-        //         position: correctLocation,
-        //         map: map,
-        //         icon: {
-        //             url: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',
-        //             scaledSize: new google.maps.Size(32, 32)
-        //         },
-        //         title: "Local Correto"
-        //     });
+            // Add correct location marker
+            new google.maps.Marker({
+                position: correctLocation,
+                map: map,
+                icon: {
+                    url: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',
+                    scaledSize: new google.maps.Size(32, 32)
+                },
+                title: "Local Correto"
+            });
             
-        //     // Add guessed location marker
-        //     new google.maps.Marker({
-        //         position: guessedLocation,
-        //         map: map,
-        //         icon: {
-        //             url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
-        //             scaledSize: new google.maps.Size(32, 32)
-        //         },
-        //         title: "Seu Palpite"
-        //     });
+            // Add guessed location marker
+            new google.maps.Marker({
+                position: guessedLocation,
+                map: map,
+                icon: {
+                    url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
+                    scaledSize: new google.maps.Size(32, 32)
+                },
+                title: "Seu Palpite"
+            });
             
-        //     // Add line between markers
-        //     new google.maps.Polyline({
-        //         path: [guessedLocation, correctLocation],
-        //         geodesic: true,
-        //         strokeColor: '#3B82F6',
-        //         strokeOpacity: 0.7,
-        //         strokeWeight: 3,
-        //         map: map
-        //     });
+            // Add line between markers
+            new google.maps.Polyline({
+                path: [guessedLocation, correctLocation],
+                geodesic: true,
+                strokeColor: '#3B82F6',
+                strokeOpacity: 0.7,
+                strokeWeight: 3,
+                map: map
+            });
             
-        //     // Fit bounds to show both locations
-        //     const bounds = new google.maps.LatLngBounds();
-        //     bounds.extend(guessedLocation);
-        //     bounds.extend(correctLocation);
-        //     map.fitBounds(bounds);
+            // Fit bounds to show both locations
+            const bounds = new google.maps.LatLngBounds();
+            bounds.extend(guessedLocation);
+            bounds.extend(correctLocation);
+            map.fitBounds(bounds);
             
-        //     // Show map
-        //     document.getElementById('street-view-container').style.display = 'none';
-        //     document.getElementById('map-container').classList.add('show');
+            // Show map
+            document.getElementById('street-view-container').style.display = 'none';
+            document.getElementById('map-container').classList.add('show');
             
-        //     // Change confirm button to continue
-        //     const confirmBtn = document.getElementById('confirmBtn');
-        //     confirmBtn.innerHTML = '<i class="fas fa-arrow-right mr-1"></i> Continuar';
-        //     confirmBtn.onclick = () => {
-        //         confirmBtn.innerHTML = '<i class="fas fa-check-circle mr-1"></i> Confirmar Palpite';
-        //         confirmBtn.onclick = confirmGuess;
-        //         newRound();
-        //     };
-        // }
+            // Change confirm button to continue
+            const confirmBtn = document.getElementById('confirmBtn');
+            confirmBtn.innerHTML = '<i class="fas fa-arrow-right mr-1"></i> Continuar';
+            confirmBtn.onclick = () => {
+                confirmBtn.innerHTML = '<i class="fas fa-check-circle mr-1"></i> Confirmar Palpite';
+                confirmBtn.onclick = confirmGuess;
+                newRound();
+            };
+        }
 
         function endGame() {
             // Calculate performance rating
