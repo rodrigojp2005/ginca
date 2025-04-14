@@ -1391,88 +1391,44 @@ const brazilianCapitals = [
         maxAttempts = 3;
 
         async function confirmGuess() {
-        if (!marker) {
-            Swal.fire({
-                title: 'Ops!',
-                text: 'Por favor, marque um local no mapa!',
-                icon: 'warning',
-                confirmButtonColor: '#3B82F6'
-            });
-            return;
+            if (!marker) {
+                Swal.fire('Marque um local no mapa primeiro!', '', 'warning');
+                return;
+            }
+
+            const guessedPos = marker.getPosition();
+            const correctPos = new google.maps.LatLng(correctLocation.lat, correctLocation.lng);
+            const distance = google.maps.geometry.spherical.computeDistanceBetween(guessedPos, correctPos) / 1000;
+
+            // Se acertou (ex.: < 1 km)
+            if (distance < 1) {
+                endRound(true, distance, attempts);
+                return;
+            }
+
+            // Se ainda tem tentativas
+            if (attempts < maxAttempts) {
+                const heading = google.maps.geometry.spherical.computeHeading(guessedPos, correctPos);
+                const direction = getDirectionFromHeading(heading); // Função para converter ângulo em texto (ex.: "nordeste")
+
+                await Swal.fire({
+                    title: 'Quase lá!',
+                    html: `Tente mover para o <b>${direction}</b>. Tentativa ${attempts}/${maxAttempts}`,
+                    icon: 'info',
+                    confirmButtonText: 'Tentar Novamente'
+                });
+
+                attempts++;
+            } else {
+                endRound(false, distance, attempts);
+            }
         }
 
-        const guessedPos = marker.getPosition();
-        const correctPos = new google.maps.LatLng(correctLocation.lat, correctLocation.lng);
-        currentDistance = google.maps.geometry.spherical.computeDistanceBetween(guessedPos, correctPos) / 1000;
-
-        // Se acertou (ex.: < 1 km)
-        if (currentDistance < 1) {
-            handleRoundResult(true);
-            return;
+        function getDirectionFromHeading(heading) {
+            const directions = ['norte', 'nordeste', 'leste', 'sudeste', 'sul', 'sudoeste', 'oeste', 'noroeste'];
+            const index = Math.round(((heading + 360) % 360) / 45);
+            return directions[index % 8];
         }
-
-        // Se ainda tem tentativas
-        if (attempts < maxAttempts) {
-            const heading = google.maps.geometry.spherical.computeHeading(guessedPos, correctPos);
-            const direction = getDirectionFromHeading(heading);
-
-            await Swal.fire({
-                title: 'Quase lá!',
-                html: `Seu palpite está a <b>${Math.ceil(currentDistance)} km</b> do local. Tente mover para o <b>${direction}</b>.<br><br>Tentativa ${attempts}/${maxAttempts}`,
-                icon: 'info',
-                confirmButtonText: 'Tentar Novamente',
-                confirmButtonColor: '#3B82F6'
-            });
-
-            attempts++;
-        } else {
-            handleRoundResult(false);
-        }
-    }
-
-    function getDirectionFromHeading(heading) {
-    const directions = ['norte', 'nordeste', 'leste', 'sudeste', 'sul', 'sudoeste', 'oeste', 'noroeste'];
-    const index = Math.round(((heading + 360) % 360) / 45);
-    return directions[index % 8];
-}
-
-function handleRoundResult(isCorrect) {
-    const points = calculatePoints(currentDistance, attempts);
-    score += Math.round(points);
-    document.getElementById("score").textContent = score;
-
-    // Mostra o resultado final da rodada
-    const locationParts = correctLocation.name.split(', ');
-    const city = locationParts[0];
-    const country = locationParts.length > 1 ? locationParts[locationParts.length - 1] : correctLocation.name;
-
-    Swal.fire({
-        title: isCorrect ? 'Acertou!' : 'Rodada Finalizada',
-        html: `
-            <div class="text-left space-y-2">
-                <p><b>Local correto:</b> ${city}, ${country}</p>
-                <p><b>Sua distância:</b> ${Math.ceil(currentDistance)} km</p>
-                <p><b>Pontos ganhos:</b> ${Math.round(points)}</p>
-                <p><b>Tentativas:</b> ${attempts}/${maxAttempts}</p>
-                <p class="text-sm text-gray-500">Rodada ${roundsPlayed + 1} de ${maxRounds}</p>
-            </div>
-        `,
-        icon: isCorrect ? 'success' : 'info',
-        confirmButtonText: 'Próximo local',
-        confirmButtonColor: '#3B82F6',
-    }).then(() => {
-        roundsPlayed++;
-        attempts = 1; // Reseta tentativas para a próxima rodada
-        newRound();
-    });
-}
-
-function calculatePoints(distance, attemptsUsed) {
-    const basePoints = Math.max(0, 5000 - Math.floor(distance)) / 100;
-    // Penalidade de 20% por tentativa extra
-    const penalty = (attemptsUsed - 1) * 0.2;
-    return basePoints * (1 - penalty);
-}
 
         function endGame() {
             // Calculate performance rating

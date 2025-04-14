@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css">
 
+
     <style>
         :root {
             --primary: #3B82F6;
@@ -296,7 +297,7 @@
             text-align: center;
         }
 
-        #cityMenu {
+        #stateMenu {
             position: absolute;
             top: 100%;
             left: 0;
@@ -310,19 +311,19 @@
             width: 12rem;
         }
 
-        #cityMenu div {
+        #stateMenu div {
             padding: 0.75rem 1rem;
             cursor: pointer;
             border-bottom: 1px solid #F1F5F9;
             transition: all 0.2s ease;
         }
 
-        #cityMenu div:hover {
+        #stateMenu div:hover {
             background: #F8FAFC;
             color: var(--primary);
         }
 
-        #cityMenu div:last-child {
+        #stateMenu div:last-child {
             border-bottom: none;
         }
 
@@ -415,6 +416,12 @@
         <p class="text-sm opacity-75 mt-2">Por favor, aguarde</p>
     </div>
 
+        <!-- @if (session('status'))
+            <div class="alert alert-success">
+                {{ session('status') }}
+            </div>
+        @endif -->
+
     <!-- Navigation -->
     <nav class="navbar fixed top-0 left-0 w-full z-30 py-2 px-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
@@ -428,6 +435,9 @@
             </div>
             <div class="flex items-center space-x-4">
                 <span id="user-info" class="text-white text-sm hidden sm:block"></span>
+                <!-- <button id="logout-button" onclick="logout()" class="text-white hover:text-yellow-200 text-sm hidden sm:block">
+                    Sair
+                </button> -->
                 <div class="tooltip">
                     <button id="mobile-menu-button" class="p-2 text-white">
                         <img src="https://media.tenor.com/MG0VpR0F0-sAAAAi/icon-cute.gif" alt="Menu" class="w-8 h-8">
@@ -452,12 +462,16 @@
             <i class="fas fa-envelope text-blue-500"></i>
             Contato
         </div>
+        <!-- <div class="menu-item sm:hidden" onclick="logout()">
+            <i class="fas fa-sign-out-alt text-blue-500"></i>
+            Sair
+        </div> -->
     </div>
 
     <!-- Game Mode Selector -->
     <div class="game-mode-selector">
-        <button class="game-mode-btn active" id="cityMode" onclick="showCityMenu()">
-            <i class="fas fa-city mr-1"></i> Cidades
+        <button class="game-mode-btn active" id="stateMode" onclick="showStateMenu()">
+            <i class="fas fa-map-marker-alt mr-1"></i> Estado
         </button>
         <button class="game-mode-btn" id="brazilMode" onclick="setGameMode('brazil')">
             <i class="flag-icon flag-icon-br mr-1"></i> Brasil
@@ -471,6 +485,7 @@
     <div class="game-container">
         <!-- Round Indicator -->
         <div class="round-indicator">
+            <!-- <i class="fas fa-map-pin mr-1"></i> -->
             <span id="roundCounter">1/5</span>
         </div>
 
@@ -532,57 +547,48 @@
         let gameSeed = Math.floor(Math.random() * 1000000);
         let usedLocations = [];
         let lastLocationRegion = null;
-        let gameMode = 'city';
-      //  let userCity = null;
-        //let cityBounds = null;
+        let gameMode = 'state';
+        let userState = null;
+        let stateBounds = null;
         let currentDistance = 0;
-        
-        // Game Variables - Adicionar variáveis para cidades
-        let userCity = null;
-        let cityBounds = null;
 
-
-// Dados das capitais brasileiras
-const brazilianCapitals = [
-            {name: "Rio Branco", state: "Acre", code: "AC", lat: -9.97499, lng: -67.8243},
-            {name: "Maceió", state: "Alagoas", code: "AL", lat: -9.66599, lng: -35.735},
-            {name: "Macapá", state: "Amapá", code: "AP", lat: 0.034934, lng: -51.0694},
-            {name: "Manaus", state: "Amazonas", code: "AM", lat: -3.11903, lng: -60.0217},
-            {name: "Salvador", state: "Bahia", code: "BA", lat: -12.9718, lng: -38.5011},
-            {name: "Fortaleza", state: "Ceará", code: "CE", lat: -3.71839, lng: -38.5434},
-            {name: "Brasília", state: "Distrito Federal", code: "DF", lat: -15.7797, lng: -47.9297},
-            {name: "Vitória", state: "Espírito Santo", code: "ES", lat: -20.3194, lng: -40.3378},
-            {name: "Goiânia", state: "Goiás", code: "GO", lat: -16.6864, lng: -49.2643},
-            {name: "São Luís", state: "Maranhão", code: "MA", lat: -2.53874, lng: -44.2825},
-            {name: "Cuiabá", state: "Mato Grosso", code: "MT", lat: -15.601, lng: -56.0974},
-            {name: "Campo Grande", state: "Mato Grosso do Sul", code: "MS", lat: -20.4697, lng: -54.6201},
-            {name: "Belo Horizonte", state: "Minas Gerais", code: "MG", lat: -19.9167, lng: -43.9345},
-            {name: "Belém", state: "Pará", code: "PA", lat: -1.4554, lng: -48.4898},
-            {name: "João Pessoa", state: "Paraíba", code: "PB", lat: -7.1195, lng: -34.845},
-            {name: "Curitiba", state: "Paraná", code: "PR", lat: -25.4296, lng: -49.2713},
-            {name: "Recife", state: "Pernambuco", code: "PE", lat: -8.05428, lng: -34.8813},
-            {name: "Teresina", state: "Piauí", code: "PI", lat: -5.08921, lng: -42.8016},
-            {name: "Rio de Janeiro", state: "Rio de Janeiro", code: "RJ", lat: -22.9068, lng: -43.1729},
-            {name: "Natal", state: "Rio Grande do Norte", code: "RN", lat: -5.79357, lng: -35.1986},
-            {name: "Porto Alegre", state: "Rio Grande do Sul", code: "RS", lat: -30.0318, lng: -51.2065},
-            {name: "Porto Velho", state: "Rondônia", code: "RO", lat: -8.76116, lng: -63.9004},
-            {name: "Boa Vista", state: "Roraima", code: "RR", lat: 2.82351, lng: -60.6758},
-            {name: "Florianópolis", state: "Santa Catarina", code: "SC", lat: -27.5945, lng: -48.5477},
-            {name: "São Paulo", state: "São Paulo", code: "SP", lat: -23.5505, lng: -46.6333},
-            {name: "Aracaju", state: "Sergipe", code: "SE", lat: -10.9472, lng: -37.0731},
-            {name: "Palmas", state: "Tocantins", code: "TO", lat: -10.2499, lng: -48.3243}
+        // Brazilian States Data
+        const brazilianStates = [
+            {name: "Acre", code: "AC"},
+            {name: "Alagoas", code: "AL"},
+            {name: "Amapá", code: "AP"},
+            {name: "Amazonas", code: "AM"},
+            {name: "Bahia", code: "BA"},
+            {name: "Ceará", code: "CE"},
+            {name: "Distrito Federal", code: "DF"},
+            {name: "Espírito Santo", code: "ES"},
+            {name: "Goiás", code: "GO"},
+            {name: "Maranhão", code: "MA"},
+            {name: "Mato Grosso", code: "MT"},
+            {name: "Mato Grosso do Sul", code: "MS"},
+            {name: "Minas Gerais", code: "MG"},
+            {name: "Pará", code: "PA"},
+            {name: "Paraíba", code: "PB"},
+            {name: "Paraná", code: "PR"},
+            {name: "Pernambuco", code: "PE"},
+            {name: "Piauí", code: "PI"},
+            {name: "Rio de Janeiro", code: "RJ"},
+            {name: "Rio Grande do Norte", code: "RN"},
+            {name: "Rio Grande do Sul", code: "RS"},
+            {name: "Rondônia", code: "RO"},
+            {name: "Roraima", code: "RR"},
+            {name: "Santa Catarina", code: "SC"},
+            {name: "São Paulo", code: "SP"},
+            {name: "Sergipe", code: "SE"},
+            {name: "Tocantins", code: "TO"}
         ];
-
-        // Place types for nearby search
-        const PLACE_TYPES = {
-            RESTAURANT: 'restaurant',
-            LANDMARK: 'tourist_attraction',
-            PARK: 'park'
-        };
 
         // Initialize the game when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
+            // Show welcome message after a short delay
             setTimeout(showWelcomeAlert, 1500);
+            
+            // Setup event listeners
             setupEventListeners();
         });
 
@@ -607,10 +613,18 @@ const brazilianCapitals = [
         }
 
         function setupEventListeners() {
+            // Mobile menu toggle
             document.getElementById('mobile-menu-button').addEventListener('click', toggleMobileMenu);
+            
+            // Map toggle
             document.getElementById('mapToggle').addEventListener('click', toggleMap);
+            
+            // Confirm guess button
             document.getElementById('confirmBtn').addEventListener('click', confirmGuess);
             
+            // Map click listener will be added after map initialization
+            
+            // Social share buttons
             document.getElementById('share-facebook').addEventListener('click', (e) => {
                 e.preventDefault();
                 shareOnFacebook();
@@ -631,6 +645,7 @@ const brazilianCapitals = [
                 shareOnTwitter();
             });
             
+            // Close mobile menu when clicking outside
             document.addEventListener('click', (e) => {
                 if (!e.target.closest('#mobile-menu-button') && !e.target.closest('#mobile-menu')) {
                     document.getElementById('mobile-menu').classList.remove('show');
@@ -731,59 +746,68 @@ const brazilianCapitals = [
         function setGameMode(mode) {
             gameMode = mode;
             
-            document.getElementById('cityMode').classList.remove('active');
+            // Update button appearance
+            document.getElementById('stateMode').classList.remove('active');
             document.getElementById('brazilMode').classList.remove('active');
             document.getElementById('worldMode').classList.remove('active');
             document.getElementById(mode + 'Mode').classList.add('active');
             
+            // Reset game with new mode
             resetGame();
         }
 
-        // function showStateMenu() {
-        //     const menuHtml = `
-        //         <div id="stateMenu" class="shadow-lg">
-        //             ${brazilianStates.map(state => `
-        //                 <div onclick="selectState('${state.name}', '${state.code}')">
-        //                     <i class="fas fa-map-marker-alt text-blue-500 mr-2"></i>
-        //                     ${state.name}
-        //                 </div>
-        //             `).join('')}
-        //         </div>
-        //     `;
+        function showStateMenu() {
+            const menuHtml = `
+                <div id="stateMenu" class="shadow-lg">
+                    ${brazilianStates.map(state => `
+                        <div onclick="selectState('${state.name}', '${state.code}')">
+                            <i class="fas fa-map-marker-alt text-blue-500 mr-2"></i>
+                            ${state.name}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
             
-        //     const existingMenu = document.getElementById('stateMenu');
-        //     if (existingMenu) existingMenu.remove();
+            // Remove existing menu if any
+            const existingMenu = document.getElementById('stateMenu');
+            if (existingMenu) existingMenu.remove();
             
-        //     const stateButton = document.getElementById('stateMode');
-        //     stateButton.insertAdjacentHTML('afterend', menuHtml);
+            // Add new menu
+            const stateButton = document.getElementById('stateMode');
+            stateButton.insertAdjacentHTML('afterend', menuHtml);
             
-        //     setTimeout(() => {
-        //         document.addEventListener('click', closeStateMenu);
-        //     }, 100);
-        // }
+            // Close menu when clicking outside
+            setTimeout(() => {
+                document.addEventListener('click', closeStateMenu);
+            }, 100);
+        }
 
-        // function closeStateMenu(e) {
-        //     const stateMenu = document.getElementById('stateMenu');
-        //     const stateButton = document.getElementById('stateMode');
+        function closeStateMenu(e) {
+            const stateMenu = document.getElementById('stateMenu');
+            const stateButton = document.getElementById('stateMode');
             
-        //     if (stateMenu && e.target !== stateButton && !stateButton.contains(e.target)) {
-        //         stateMenu.remove();
-        //         document.removeEventListener('click', closeStateMenu);
-        //     }
-        // }
+            if (stateMenu && e.target !== stateButton && !stateButton.contains(e.target)) {
+                stateMenu.remove();
+                document.removeEventListener('click', closeStateMenu);
+            }
+        }
 
-        // function selectState(stateName, stateCode) {
-        //     userState = stateName;
-        //     document.getElementById('stateMode').innerHTML = `
-        //         <i class="fas fa-map-marker-alt mr-1"></i> ${stateName}
-        //     `;
-        //     document.getElementById('stateMenu').remove();
+        function selectState(stateName, stateCode) {
+            userState = stateName;
+            document.getElementById('stateMode').innerHTML = `
+                <i class="fas fa-map-marker-alt mr-1"></i> ${stateName}
+            `;
+            document.getElementById('stateMenu').remove();
             
-        //     setStateBounds(stateCode);
-        //     resetGame();
-        // }
+            // Set approximate state bounds
+            setStateBounds(stateCode);
+            
+            // Reset game with new state
+            resetGame();
+        }
 
         function setStateBounds(stateCode) {
+            // Simplified state centers (in practice you'd need exact coordinates)
             const stateCenters = {
                 'AC': {lat: -9.11, lng: -70.52},
                 'AL': {lat: -9.57, lng: -36.55},
@@ -809,169 +833,64 @@ const brazilianCapitals = [
                 'SP': {lat: -23.55, lng: -46.63},
             };
             
-            const center = stateCenters[stateCode] || {lat: -15.78, lng: -47.93};
+            const center = stateCenters[stateCode] || {lat: -15.78, lng: -47.93}; // Fallback: Brasília
             stateBounds = new google.maps.LatLngBounds(
-                new google.maps.LatLng(center.lat - 1, center.lng - 1),
+                new google.maps.LatLng(center.lat - 1, center.lng - 1), // ~100km radius
                 new google.maps.LatLng(center.lat + 1, center.lng + 1)
             );
         }
 
-      async function detectUserLocation() {
-        return new Promise((resolve, reject) => {
-            const options = {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
-            };
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    async (position) => {
-                        try {
-                            // Obter coordenadas com alta precisão
-                            const highAccuracyLocation = {
-                                lat: position.coords.latitude,
-                                lng: position.coords.longitude,
-                                accuracy: position.coords.accuracy
-                            };
-
-                            // Melhorar com geocodificação reversa (Opção 3)
-                            const geocoder = new google.maps.Geocoder();
-                            const response = await new Promise((resolve, reject) => {
-                                geocoder.geocode({ location: highAccuracyLocation }, (results, status) => {
-                                    status === 'OK' ? resolve(results) : reject(status);
+        async function detectUserLocation() {
+            return new Promise((resolve, reject) => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        async (position) => {
+                            const lat = position.coords.latitude;
+                            const lng = position.coords.longitude;
+                            
+                            try {
+                                const geocoder = new google.maps.Geocoder();
+                                const response = await new Promise((resolve, reject) => {
+                                    geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+                                        if (status === 'OK' && results[0]) {
+                                            resolve(results[0]);
+                                        } else {
+                                            reject(status);
+                                        }
+                                    });
                                 });
-                            });
-
-                            // Extrair cidade e estado
-                          //  let city, state, stateCode;
-                            for (const component of response[0].address_components) {
-                                if (component.types.includes('locality')) {
-                                    userCity = component.long_name;
-                                   // city = component.long_name;
-                                } else if (component.types.includes('administrative_area_level_1')) {
-                                   // state = component.long_name;
-                                   // stateCode = component.short_name;
-                                   // userState = state;
-                                     userState = component.long_name;
+                                
+                                // Find city and state
+                                let city, state;
+                                for (const component of response.address_components) {
+                                    if (component.types.includes('locality')) {
+                                        city = component.long_name;
+                                    } else if (component.types.includes('administrative_area_level_1')) {
+                                        state = component.long_name;
+                                        userState = state;
+                                    }
                                 }
+                                
+                                // Set ~100km radius around the city
+                                stateBounds = new google.maps.LatLngBounds();
+                                const radius = 50 / 111.32; // Approximate degrees for 100km
+                                stateBounds.extend(new google.maps.LatLng(lat - radius, lng - radius));
+                                stateBounds.extend(new google.maps.LatLng(lat + radius, lng + radius));
+                                
+                                resolve({ lat, lng, city, state });
+                            } catch (error) {
+                                console.error("Geocoding error:", error);
+                                reject(error);
                             }
-
-                             // Definir área de busca (20km ao redor)
-                             cityBounds = new google.maps.LatLngBounds();
-                                const radius = 0.18; // ~20km
-                                cityBounds.extend(new google.maps.LatLng(
-                                    highAccuracyLocation.lat - radius, 
-                                    highAccuracyLocation.lng - radius
-                                ));
-                                cityBounds.extend(new google.maps.LatLng(
-                                    highAccuracyLocation.lat + radius, 
-                                    highAccuracyLocation.lng + radius
-                                ));
-
-                              // Atualizar UI
-                              if (userCity) {
-                                    document.getElementById('cityMode').innerHTML = `
-                                        <i class="fas fa-city mr-1"></i> ${userCity}
-                                    `;
-                                }
-
-                                resolve(highAccuracyLocation);
-
-                        } catch (error) {
-                            console.error("Error enhancing location:", error);
+                        },
+                        (error) => {
+                            console.error("Geolocation error:", error);
                             reject(error);
                         }
-                    },
-                    (error) => {
-                        console.error("Geolocation error:", error);
-                        reject(error);
-                    },
-                    options
-                );
-            } else {
-                reject("Geolocation not supported");
-            }
-        });
-    }
-
-        // Nova função para mostrar menu de cidades (capitais)
-        function showCityMenu() {
-            const menuHtml = `
-                <div id="cityMenu" class="shadow-lg">
-                    ${brazilianCapitals.map(city => `
-                        <div onclick="selectCity('${city.name}', '${city.state}', ${city.lat}, ${city.lng})">
-                            <i class="fas fa-city text-blue-500 mr-2"></i>
-                            ${city.name} - ${city.state}
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-            
-            const existingMenu = document.getElementById('cityMenu');
-            if (existingMenu) existingMenu.remove();
-            
-            const cityButton = document.getElementById('cityMode');
-            cityButton.insertAdjacentHTML('afterend', menuHtml);
-            
-            setTimeout(() => {
-                document.addEventListener('click', closeCityMenu);
-            }, 100);
-        }
-
-        function closeCityMenu(e) {
-            const cityMenu = document.getElementById('cityMenu');
-            const cityButton = document.getElementById('cityMode');
-            
-            if (cityMenu && e.target !== cityButton && !cityButton.contains(e.target)) {
-                cityMenu.remove();
-                document.removeEventListener('click', closeCityMenu);
-            }
-        }
-
-        // Função para selecionar uma cidade (capital)
-        function selectCity(cityName, stateName, lat, lng) {
-            userCity = cityName;
-            document.getElementById('cityMode').innerHTML = `
-                <i class="fas fa-city mr-1"></i> ${cityName}
-            `;
-            document.getElementById('cityMenu').remove();
-            
-            // Definir área de busca (20km ao redor da capital)
-            cityBounds = new google.maps.LatLngBounds();
-            const radius = 0.18; // ~20km
-            cityBounds.extend(new google.maps.LatLng(lat - radius, lng - radius));
-            cityBounds.extend(new google.maps.LatLng(lat + radius, lng + radius));
-            
-            resetGame();
-        }
-
-        async function getNearbyPlaces(lat, lng, radius = 50000, type = PLACE_TYPES.RESTAURANT) {
-            return new Promise((resolve, reject) => {
-                const placesService = new google.maps.places.PlacesService(document.createElement('div'));
-                
-                placesService.nearbySearch({
-                    location: { lat, lng },
-                    radius: radius,
-                    type: type,
-                    openNow: true
-                }, (results, status) => {
-                    if (status === 'OK' && results.length > 0) {
-                        const validPlaces = results.filter(place => 
-                            place.photos && 
-                            place.rating >= 3.5 && 
-                            place.user_ratings_total > 10
-                        );
-                        
-                        if (validPlaces.length > 0) {
-                            resolve(validPlaces);
-                        } else {
-                            reject("No suitable places found");
-                        }
-                    } else {
-                        reject(status);
-                    }
-                });
+                    );
+                } else {
+                    reject("Geolocation not supported");
+                }
             });
         }
 
@@ -990,20 +909,23 @@ const brazilianCapitals = [
         }
 
         function getRandomBrazilLocation() {
-            const lat = -33 + Math.random() * 26;
-            const lng = -74 + Math.random() * 39;
+            // Generate coordinates within Brazil
+            const lat = -33 + Math.random() * 26; // Between -33° and -7°
+            const lng = -74 + Math.random() * 39; // Between -74° and -35°
             return { lat, lng };
         }
 
         function getRandomWorldLocation() {
+            // Generate coordinates in different world regions
             const regions = [
-                { latRange: [-35, 35], lngRange: [-180, -30] },
-                { latRange: [-35, 35], lngRange: [-30, 60] },
-                { latRange: [-35, 35], lngRange: [60, 180] },
-                { latRange: [35, 70], lngRange: [-10, 40] },
-                { latRange: [-60, -20], lngRange: [-80, -30] }
+                { latRange: [-35, 35], lngRange: [-180, -30] }, // Americas
+                { latRange: [-35, 35], lngRange: [-30, 60] },   // Africa/Europe
+                { latRange: [-35, 35], lngRange: [60, 180] },   // Asia/Oceania
+                { latRange: [35, 70], lngRange: [-10, 40] },    // Northern Europe
+                { latRange: [-60, -20], lngRange: [-80, -30] }  // Southern Cone
             ];
             
+            // Avoid repeating the same region consecutively
             let region;
             do {
                 region = regions[Math.floor(Math.random() * regions.length)];
@@ -1034,6 +956,7 @@ const brazilianCapitals = [
                     preference: google.maps.StreetViewPreference.BEST
                 }, (data, status) => {
                     if (status === 'OK') {
+                        // Strict filters for identifiable locations
                         const isGoodLocation = data.location && 
                              data.location.description &&
                              !data.location.description.includes("Indoor") &&
@@ -1080,6 +1003,7 @@ const brazilianCapitals = [
                 let state = "";
                 let address = response.formatted_address || "";
                 
+                // Extract address information
                 for (const component of response.address_components) {
                     if (component.types.includes('locality')) {
                         city = component.long_name;
@@ -1094,6 +1018,7 @@ const brazilianCapitals = [
                     }
                 }
                 
+                // Try to create a meaningful name
                 if (city && state && country) {
                     return `${city}, ${state}, ${country}`;
                 } else if (city && state) {
@@ -1107,8 +1032,10 @@ const brazilianCapitals = [
                 } else if (country) {
                     return country;
                 } else if (address) {
+                    // Get first two elements of address
                     return address.split(",").slice(0, 2).join(",").trim();
                 } else {
+                    // Fallback - coordinates
                     return `Local (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
                 }
             } catch (error) {
@@ -1116,86 +1043,50 @@ const brazilianCapitals = [
                 return `Local (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
             }
         }
-        
+
         async function getRandomLocation() {
             const maxAttempts = 20;
             let attempts = 0;
             
             while (attempts < maxAttempts) {
+                let lat, lng;
+                
+                // Choose coordinate generation strategy based on game mode
+                switch (gameMode) {
+                    case 'state':
+                        const stateCoords = getRandomStateLocation();
+                        lat = stateCoords.lat;
+                        lng = stateCoords.lng;
+                        break;
+                    case 'brazil':
+                        const brazilCoords = getRandomBrazilLocation();
+                        lat = brazilCoords.lat;
+                        lng = brazilCoords.lng;
+                        break;
+                    case 'world':
+                        const worldCoords = getRandomWorldLocation();
+                        lat = worldCoords.lat;
+                        lng = worldCoords.lng;
+                        break;
+                }
+                
                 try {
-                    // Estratégia diferente para o modo estado com geolocalização
-                    if (gameMode === 'city' && cityBounds) {
-                        // Tentar primeiro encontrar lugares próximos (restaurantes)
-                        try {
-                            const center = cityBounds.getCenter();
-                            const places = await getNearbyPlaces(center.lat(), center.lng(), 20000); // Raio de 20km
-                            
-                            // Escolher um lugar aleatório
-                            const randomPlace = places[Math.floor(Math.random() * places.length)];
-                            const placeLocation = randomPlace.geometry.location;
-                            
-                            // Verificar se o panorama está disponível
-                            const panoramaData = await getPanoramaData(
-                                placeLocation.lat(), 
-                                placeLocation.lng(),
-                                100 // Raio menor para lugares específicos
-                            );
-                            
-                            // Obter nome do lugar
-                            const locationName = randomPlace.name || await getCityName(
-                                placeLocation.lat(), 
-                                placeLocation.lng()
-                            );
-                            
-                            // Adicionar ao cache de locais usados
-                            usedLocations.push({
-                                lat: placeLocation.lat(),
-                                lng: placeLocation.lng()
-                            });
-                            
-                            return {
-                                lat: placeLocation.lat(),
-                                lng: placeLocation.lng(),
-                                name: locationName
-                            };
-                        } catch (placeError) {
-                            console.log("Falling back to random street view for state mode:", placeError);
-                            // Se falhar, continuar com a abordagem normal
-                        }
-                    }
-                    
-                    // Abordagem original para outros modos ou fallback
-                    let lat, lng;
-                    
-                    switch (gameMode) {
-                        case 'state':
-                            const stateCoords = getRandomStateLocation();
-                            lat = stateCoords.lat;
-                            lng = stateCoords.lng;
-                            break;
-                        case 'brazil':
-                            const brazilCoords = getRandomBrazilLocation();
-                            lat = brazilCoords.lat;
-                            lng = brazilCoords.lng;
-                            break;
-                        case 'world':
-                            const worldCoords = getRandomWorldLocation();
-                            lat = worldCoords.lat;
-                            lng = worldCoords.lng;
-                            break;
-                    }
-                    
                     const panoramaData = await getPanoramaData(lat, lng);
                     const locationName = await getCityName(
                         panoramaData.location.latLng.lat(),
                         panoramaData.location.latLng.lng()
                     );
                     
-                    // Adicionar ao cache de locais usados
+                    // Add to used locations cache
                     usedLocations.push({
                         lat: panoramaData.location.latLng.lat(),
                         lng: panoramaData.location.latLng.lng()
                     });
+                    
+                    // Limit cache size
+                    if (usedLocations.length > 50) {
+                        usedLocations.shift();
+                    }
                     
                     return {
                         lat: panoramaData.location.latLng.lat(),
@@ -1208,7 +1099,7 @@ const brazilianCapitals = [
                 }
             }
             
-            // Fallback extremo
+            // Extreme fallback - random coordinates (very rare to reach here)
             console.warn("Using random location fallback after", maxAttempts, "attempts");
             const fallbackCoords = gameMode === 'brazil' ? getRandomBrazilLocation() :
                                   gameMode === 'state' ? getRandomStateLocation() : getRandomWorldLocation();
@@ -1263,20 +1154,17 @@ const brazilianCapitals = [
             // First detect user location to set default state
             try {
                 await detectUserLocation();
-                if (userCity) {
-                    gameMode = 'city';
-                    document.getElementById('cityMode').classList.add('active');
-                }else {
-                    // Se não detectar cidade, mostra capitais como fallback
-                    gameMode = 'city';
-                    document.getElementById('cityMode').classList.add('active');
+                if (userState) {
+                    document.getElementById('stateMode').innerHTML = `
+                        <i class="fas fa-map-marker-alt mr-1"></i> ${userState}
+                    `;
                 }
             } catch (error) {
                 console.error("Could not detect user location:", error);
                 // Fallback to Brazil if can't detect state
                 gameMode = 'brazil';
                 document.getElementById('brazilMode').classList.add('active');
-                document.getElementById('cityMode').classList.remove('active');
+                document.getElementById('stateMode').classList.remove('active');
             }
             
             // Initialize map
@@ -1349,10 +1237,12 @@ const brazilianCapitals = [
                     zoom: 1,
                     disableDefaultUI: true,
                     showRoadLabels: false,
+                    // desabiilitar controlle do zoom
                     zoomControl: true,
-                    zoomControlOptions: {
+                     zoomControlOptions: {
+                        // posicionar no meio na esquerda da tela
                         position: google.maps.ControlPosition.LEFT_BOTTOM,
-                    },
+                     },
                     motionTracking: false
                 }
             );
@@ -1387,92 +1277,94 @@ const brazilianCapitals = [
             }
         }
 
-        attempts = 1;
-        maxAttempts = 3;
-
-        async function confirmGuess() {
-        if (!marker) {
+        function confirmGuess() {
+            if (!marker) {
+                Swal.fire({
+                    title: 'Ops!',
+                    text: 'Por favor, marque um local no mapa!',
+                    icon: 'warning',
+                    confirmButtonColor: '#3B82F6'
+                });
+                return;
+            }
+            
+            const guessedLocation = marker.getPosition();
+            currentDistance = google.maps.geometry.spherical.computeDistanceBetween(
+                guessedLocation, new google.maps.LatLng(correctLocation.lat, correctLocation.lng)
+            ) / 1000;
+            
+            // Calculate points (more points for closer guesses)
+            const points = Math.max(0, 5000 - Math.floor(currentDistance)) / 100;
+            score += Math.round(points);
+            document.getElementById("score").textContent = score;
+            
+            // Show distance meter
+            document.getElementById('distanceText').textContent = `${Math.ceil(currentDistance)} km`;
+            document.getElementById('distanceMeter').style.display = 'flex';
+            
+            // Get location parts for display
+            const locationParts = correctLocation.name.split(', ');
+            const city = locationParts[0];
+            const country = locationParts.length > 1 ? locationParts[locationParts.length - 1] : correctLocation.name;
+            
+            // Show result with appropriate message based on distance
+            let title, icon, message;
+            
+            if (currentDistance < 1) {
+                title = 'Perfeito! 🎯';
+                icon = 'success';
+                message = 'Você acertou quase exatamente! Impressionante!';
+            } else if (currentDistance < 10) {
+                title = 'Ótimo trabalho! 👍';
+                icon = 'success';
+                message = 'Muito perto do local correto!';
+            } else if (currentDistance < 100) {
+                title = 'Boa tentativa!';
+                icon = 'info';
+                message = 'Você está na região correta!';
+            } else if (currentDistance < 500) {
+                title = 'Quase lá!';
+                icon = 'info';
+                message = 'Você está no caminho certo!';
+            } else {
+                title = 'Continue tentando!';
+                icon = 'error';
+                message = 'Tente observar melhor os detalhes na próxima rodada.';
+            }
+            
             Swal.fire({
-                title: 'Ops!',
-                text: 'Por favor, marque um local no mapa!',
-                icon: 'warning',
-                confirmButtonColor: '#3B82F6'
+                title: title,
+                html: `
+                    <div class="text-left space-y-2">
+                        <p>${message}</p>
+                        <p><b>Sua distância:</b> ${Math.ceil(currentDistance)} km</p>
+                        <p><b>Local correto:</b> ${city}, ${country}</p>
+                        <p><b>Pontos ganhos:</b> ${Math.round(points)}</p>
+                        <p class="text-sm text-gray-500">Rodada ${roundsPlayed + 1} de ${maxRounds}</p>
+                    </div>
+                `,
+                icon: icon,
+                confirmButtonText: 'Próximo local',
+                confirmButtonColor: '#3B82F6',
+               // showCancelButton: true,
+               // cancelButtonText: 'Ver no mapa',
+                cancelButtonColor: '#6B7280'
+            }).then((result) => {
+                roundsPlayed++;
+                
+                if (result.isConfirmed) {
+                    newRound();
+                } 
+                //else if (result.dismiss === Swal.DismissReason.cancel) {
+                    // Show both locations on map
+                    //showBothLocations(guessedLocation);
+                //} 
+                else {
+                    newRound();
+                }
             });
-            return;
         }
 
-        const guessedPos = marker.getPosition();
-        const correctPos = new google.maps.LatLng(correctLocation.lat, correctLocation.lng);
-        currentDistance = google.maps.geometry.spherical.computeDistanceBetween(guessedPos, correctPos) / 1000;
-
-        // Se acertou (ex.: < 1 km)
-        if (currentDistance < 1) {
-            handleRoundResult(true);
-            return;
-        }
-
-        // Se ainda tem tentativas
-        if (attempts < maxAttempts) {
-            const heading = google.maps.geometry.spherical.computeHeading(guessedPos, correctPos);
-            const direction = getDirectionFromHeading(heading);
-
-            await Swal.fire({
-                title: 'Quase lá!',
-                html: `Seu palpite está a <b>${Math.ceil(currentDistance)} km</b> do local. Tente mover para o <b>${direction}</b>.<br><br>Tentativa ${attempts}/${maxAttempts}`,
-                icon: 'info',
-                confirmButtonText: 'Tentar Novamente',
-                confirmButtonColor: '#3B82F6'
-            });
-
-            attempts++;
-        } else {
-            handleRoundResult(false);
-        }
-    }
-
-    function getDirectionFromHeading(heading) {
-    const directions = ['norte', 'nordeste', 'leste', 'sudeste', 'sul', 'sudoeste', 'oeste', 'noroeste'];
-    const index = Math.round(((heading + 360) % 360) / 45);
-    return directions[index % 8];
-}
-
-function handleRoundResult(isCorrect) {
-    const points = calculatePoints(currentDistance, attempts);
-    score += Math.round(points);
-    document.getElementById("score").textContent = score;
-
-    // Mostra o resultado final da rodada
-    const locationParts = correctLocation.name.split(', ');
-    const city = locationParts[0];
-    const country = locationParts.length > 1 ? locationParts[locationParts.length - 1] : correctLocation.name;
-
-    Swal.fire({
-        title: isCorrect ? 'Acertou!' : 'Rodada Finalizada',
-        html: `
-            <div class="text-left space-y-2">
-                <p><b>Local correto:</b> ${city}, ${country}</p>
-                <p><b>Sua distância:</b> ${Math.ceil(currentDistance)} km</p>
-                <p><b>Pontos ganhos:</b> ${Math.round(points)}</p>
-                <p><b>Tentativas:</b> ${attempts}/${maxAttempts}</p>
-                <p class="text-sm text-gray-500">Rodada ${roundsPlayed + 1} de ${maxRounds}</p>
-            </div>
-        `,
-        icon: isCorrect ? 'success' : 'info',
-        confirmButtonText: 'Próximo local',
-        confirmButtonColor: '#3B82F6',
-    }).then(() => {
-        roundsPlayed++;
-        attempts = 1; // Reseta tentativas para a próxima rodada
-        newRound();
-    });
-}
-
-function calculatePoints(distance, attemptsUsed) {
-    const basePoints = Math.max(0, 5000 - Math.floor(distance)) / 100;
-    // Penalidade de 20% por tentativa extra
-    const penalty = (attemptsUsed - 1) * 0.2;
-    return basePoints * (1 - penalty);
-}
 
         function endGame() {
             // Calculate performance rating
@@ -1614,7 +1506,7 @@ function calculatePoints(distance, attemptsUsed) {
             const url = encodeURIComponent(window.location.href);
             window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
         }
-    </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3VgDsnZQDKV1w4TM-D19msn3TgOOMuzk&libraries=geometry,streetView,places&callback=initMap"></script>
+</script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3VgDsnZQDKV1w4TM-D19msn3TgOOMuzk&libraries=geometry,streetView&callback=initMap"></script>
 </body>
 </html>
