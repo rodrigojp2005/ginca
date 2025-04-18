@@ -16,3 +16,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Route::get('/maps-proxy', 'MapsController@proxy');
+Route::get('/maps-proxy', 'App\Http\Controllers\MapsController@proxy')->name('maps-proxy');
