@@ -10,12 +10,43 @@ let currentGameLocations = [];
 let gameSeed = Math.floor(Math.random() * 1000000);
 let usedLocations = [];
 let lastLocationRegion = null;
-let gameMode = 'local';
-let userLocation = null;
-let localBounds = null;
+let gameMode = 'city';
+let userCity = null;
+let cityBounds = null;
 let currentDistance = 0;
 let attempts = 1;
 const maxAttempts = 5;
+
+// Dados das capitais brasileiras
+const brazilianCapitals = [
+    {name: "Rio Branco", state: "Acre", code: "AC", lat: -9.97499, lng: -67.8243},
+    {name: "Maceió", state: "Alagoas", code: "AL", lat: -9.66599, lng: -35.735},
+    {name: "Macapá", state: "Amapá", code: "AP", lat: 0.034934, lng: -51.0694},
+    {name: "Manaus", state: "Amazonas", code: "AM", lat: -3.11903, lng: -60.0217},
+    {name: "Salvador", state: "Bahia", code: "BA", lat: -12.9718, lng: -38.5011},
+    {name: "Fortaleza", state: "Ceará", code: "CE", lat: -3.71839, lng: -38.5434},
+    {name: "Brasília", state: "Distrito Federal", code: "DF", lat: -15.7797, lng: -47.9297},
+    {name: "Vitória", state: "Espírito Santo", code: "ES", lat: -20.3194, lng: -40.3378},
+    {name: "Goiânia", state: "Goiás", code: "GO", lat: -16.6864, lng: -49.2643},
+    {name: "São Luís", state: "Maranhão", code: "MA", lat: -2.53874, lng: -44.2825},
+    {name: "Cuiabá", state: "Mato Grosso", code: "MT", lat: -15.601, lng: -56.0974},
+    {name: "Campo Grande", state: "Mato Grosso do Sul", code: "MS", lat: -20.4697, lng: -54.6201},
+    {name: "Belo Horizonte", state: "Minas Gerais", code: "MG", lat: -19.9167, lng: -43.9345},
+    {name: "Belém", state: "Pará", code: "PA", lat: -1.4554, lng: -48.4898},
+    {name: "João Pessoa", state: "Paraíba", code: "PB", lat: -7.1195, lng: -34.845},
+    {name: "Curitiba", state: "Paraná", code: "PR", lat: -25.4296, lng: -49.2713},
+    {name: "Recife", state: "Pernambuco", code: "PE", lat: -8.05428, lng: -34.8813},
+    {name: "Teresina", state: "Piauí", code: "PI", lat: -5.08921, lng: -42.8016},
+    {name: "Rio de Janeiro", state: "Rio de Janeiro", code: "RJ", lat: -22.9068, lng: -43.1729},
+    {name: "Natal", state: "Rio Grande do Norte", code: "RN", lat: -5.79357, lng: -35.1986},
+    {name: "Porto Alegre", state: "Rio Grande do Sul", code: "RS", lat: -30.0318, lng: -51.2065},
+    {name: "Porto Velho", state: "Rondônia", code: "RO", lat: -8.76116, lng: -63.9004},
+    {name: "Boa Vista", state: "Roraima", code: "RR", lat: 2.82351, lng: -60.6758},
+    {name: "Florianópolis", state: "Santa Catarina", code: "SC", lat: -27.5945, lng: -48.5477},
+    {name: "São Paulo", state: "São Paulo", code: "SP", lat: -23.5505, lng: -46.6333},
+    {name: "Aracaju", state: "Sergipe", code: "SE", lat: -10.9472, lng: -37.0731},
+    {name: "Palmas", state: "Tocantins", code: "TO", lat: -10.2499, lng: -48.3243}
+];
 
 // Place types for nearby search
 const PLACE_TYPES = {
@@ -24,29 +55,10 @@ const PLACE_TYPES = {
     PARK: 'park'
 };
 
-
-// Função para verificação segura de elementos
-function getSafeElement(id) {
-    const element = document.getElementById(id);
-    if (!element) {
-        console.warn(`Elemento com ID ${id} não encontrado`);
-        return null;
-    }
-    return element;
-}
 // Initialize the game when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Verificação segura de elementos antes de usar
-    const loadingOverlay = getSafeElement('loadingOverlay');
-    if (loadingOverlay) {
-        loadingOverlay.style.display = 'none';
-    } else {
-        console.warn('Elemento loadingOverlay não encontrado');
-    }
-
     setTimeout(showWelcomeAlert, 1500);
     setupEventListeners();
-    initMap();
 });
 
 function showWelcomeAlert() {
@@ -151,7 +163,7 @@ function showAbout() {
                 <div class="bg-blue-50 p-3 rounded-lg">
                     <h3 class="font-semibold text-blue-800 mb-1">Modos de Jogo:</h3>
                     <ul class="list-disc pl-5 space-y-1">
-                        <li><span class="font-medium">Local:</span> Locais próximos a você</li>
+                        <li><span class="font-medium">Estado:</span> Locais próximos a você</li>
                         <li><span class="font-medium">Brasil:</span> Desafios por todo o país</li>
                         <li><span class="font-medium">Mundo:</span> Explore locais globais</li>
                     </ul>
@@ -194,17 +206,45 @@ function showContact() {
 function setGameMode(mode) {
     gameMode = mode;
     
-    // Remove a classe 'active' de todos os botões de modo
-    ['localMode', 'brazilMode', 'worldMode'].forEach(id => {
-        const element = document.getElementById(id);
-        if (element) element.classList.remove('active');
-    });
-    
-    // Adiciona 'active' apenas no botão selecionado
-    const activeBtn = document.getElementById(`${mode}Mode`);
-    if (activeBtn) activeBtn.classList.add('active');
+    document.getElementById('cityMode').classList.remove('active');
+    document.getElementById('brazilMode').classList.remove('active');
+    document.getElementById('worldMode').classList.remove('active');
+    document.getElementById(mode + 'Mode').classList.add('active');
     
     resetGame();
+}
+
+function setStateBounds(stateCode) {
+    const stateCenters = {
+        'AC': {lat: -9.11, lng: -70.52},
+        'AL': {lat: -9.57, lng: -36.55},
+        'AP': {lat: 1.41, lng: -51.77},
+        'AM': {lat: -3.07, lng: -61.66},
+        'BA': {lat: -12.96, lng: -38.51},
+        'CE': {lat: -3.71, lng: -38.54},
+        'DF': {lat: -15.83, lng: -47.86},
+        'ES': {lat: -19.18, lng: -40.34},
+        'GO': {lat: -16.64, lng: -49.31},
+        'MA': {lat: -5.43, lng: -47.52},
+        'MT': {lat: -12.64, lng: -55.42},
+        'MS': {lat: -20.51, lng: -54.54},
+        'MG': {lat: -18.10, lng: -44.38},
+        'PA': {lat: -5.53, lng: -52.29},
+        'PB': {lat: -7.06, lng: -35.55},
+        'PR': {lat: -25.43, lng: -49.27},
+        'PE': {lat: -8.28, lng: -35.07},
+        'PI': {lat: -8.28, lng: -43.68},
+        'RJ': {lat: -22.91, lng: -43.21},
+        'RN': {lat: -5.22, lng: -36.52},
+        'RS': {lat: -30.02, lng: -53.10},
+        'SP': {lat: -23.55, lng: -46.63},
+    };
+    
+    const center = stateCenters[stateCode] || {lat: -15.78, lng: -47.93};
+    stateBounds = new google.maps.LatLngBounds(
+        new google.maps.LatLng(center.lat - 1, center.lng - 1),
+        new google.maps.LatLng(center.lat + 1, center.lng + 1)
+    );
 }
 
 async function detectUserLocation() {
@@ -219,12 +259,14 @@ async function detectUserLocation() {
             navigator.geolocation.getCurrentPosition(
                 async (position) => {
                     try {
+                        // Obter coordenadas com alta precisão
                         const highAccuracyLocation = {
                             lat: position.coords.latitude,
                             lng: position.coords.longitude,
                             accuracy: position.coords.accuracy
                         };
 
+                        // Melhorar com geocodificação reversa
                         const geocoder = new google.maps.Geocoder();
                         const response = await new Promise((resolve, reject) => {
                             geocoder.geocode({ location: highAccuracyLocation }, (results, status) => {
@@ -232,27 +274,33 @@ async function detectUserLocation() {
                             });
                         });
 
-                        let locationName = "Sua Região";
-                        if (response[0]?.formatted_address) {
-                            locationName = response[0].formatted_address.split(',')[0];
+                        // Extrair cidade e estado
+                        for (const component of response[0].address_components) {
+                            if (component.types.includes('locality')) {
+                                userCity = component.long_name;
+                            } else if (component.types.includes('administrative_area_level_1')) {
+                                userState = component.long_name;
+                            }
                         }
 
                         // Definir área de busca (20km ao redor)
-                        localBounds = new google.maps.LatLngBounds();
+                        cityBounds = new google.maps.LatLngBounds();
                         const radius = 0.18; // ~20km
-                        localBounds.extend(new google.maps.LatLng(
+                        cityBounds.extend(new google.maps.LatLng(
                             highAccuracyLocation.lat - radius, 
                             highAccuracyLocation.lng - radius
                         ));
-                        localBounds.extend(new google.maps.LatLng(
+                        cityBounds.extend(new google.maps.LatLng(
                             highAccuracyLocation.lat + radius, 
                             highAccuracyLocation.lng + radius
                         ));
 
-                        userLocation = {
-                            coords: highAccuracyLocation,
-                            name: locationName
-                        };
+                        // Atualizar UI
+                        if (userCity) {
+                            document.getElementById('cityMode').innerHTML = `
+                                <i class="fas fa-city mr-1"></i> ${userCity}
+                            `;
+                        }
 
                         resolve(highAccuracyLocation);
 
@@ -271,6 +319,55 @@ async function detectUserLocation() {
             reject("Geolocation not supported");
         }
     });
+}
+
+function showCityMenu() {
+    const menuHtml = `
+        <div id="cityMenu" class="shadow-lg">
+            ${brazilianCapitals.map(city => `
+                <div onclick="selectCity('${city.name}', '${city.state}', ${city.lat}, ${city.lng})">
+                    <i class="fas fa-city text-blue-500 mr-2"></i>
+                    ${city.name} - ${city.state}
+                </div>
+            `).join('')}
+        </div>
+    `;
+    
+    const existingMenu = document.getElementById('cityMenu');
+    if (existingMenu) existingMenu.remove();
+    
+    const cityButton = document.getElementById('cityMode');
+    cityButton.insertAdjacentHTML('afterend', menuHtml);
+    
+    setTimeout(() => {
+        document.addEventListener('click', closeCityMenu);
+    }, 100);
+}
+
+function closeCityMenu(e) {
+    const cityMenu = document.getElementById('cityMenu');
+    const cityButton = document.getElementById('cityMode');
+    
+    if (cityMenu && e.target !== cityButton && !cityButton.contains(e.target)) {
+        cityMenu.remove();
+        document.removeEventListener('click', closeCityMenu);
+    }
+}
+
+function selectCity(cityName, stateName, lat, lng) {
+    userCity = cityName;
+    document.getElementById('cityMode').innerHTML = `
+        <i class="fas fa-city mr-1"></i> ${cityName}
+    `;
+    document.getElementById('cityMenu').remove();
+    
+    // Definir área de busca (20km ao redor da capital)
+    cityBounds = new google.maps.LatLngBounds();
+    const radius = 0.18; // ~20km
+    cityBounds.extend(new google.maps.LatLng(lat - radius, lng - radius));
+    cityBounds.extend(new google.maps.LatLng(lat + radius, lng + radius));
+    
+    resetGame();
 }
 
 async function getNearbyPlaces(lat, lng, radius = 50000, type = PLACE_TYPES.RESTAURANT) {
@@ -302,13 +399,13 @@ async function getNearbyPlaces(lat, lng, radius = 50000, type = PLACE_TYPES.REST
     });
 }
 
-function getRandomLocalLocation() {
-    if (!localBounds) {
+function getRandomStateLocation() {
+    if (!stateBounds) {
         return getRandomBrazilLocation();
     }
     
-    const ne = localBounds.getNorthEast();
-    const sw = localBounds.getSouthWest();
+    const ne = stateBounds.getNorthEast();
+    const sw = stateBounds.getSouthWest();
     
     const lat = sw.lat() + Math.random() * (ne.lat() - sw.lat());
     const lng = sw.lng() + Math.random() * (ne.lng() - sw.lng());
@@ -389,7 +486,7 @@ async function getPanoramaData(lat, lng, radius = 50000) {
     });
 }
 
-async function getLocationName(lat, lng) {
+async function getCityName(lat, lng) {
     try {
         const geocoder = new google.maps.Geocoder();
         const response = await new Promise((resolve, reject) => {
@@ -404,7 +501,7 @@ async function getLocationName(lat, lng) {
         
         let city = "";
         let country = "";
-        let state = ""; 
+        let state = "";
         let address = response.formatted_address || "";
         
         for (const component of response.address_components) {
@@ -445,68 +542,150 @@ async function getLocationName(lat, lng) {
 }
 
 async function getRandomLocation() {
-    const MAX_ATTEMPTS = 20;
-    let attempts = 0;
-    let lastError = null;
+        const MAX_ATTEMPTS = 20;
+        let attempts = 0;
+        let lastError = null;
+    
+        while (attempts < MAX_ATTEMPTS) {
+            try {
+                // 1. Modo Cidade (GPS) - Lógica Aprimorada
+                if (gameMode === 'city' && cityBounds) {
+                    return await getCityLocation();
+                }
+    
+                // 2. Outros Modos (Brasil/Estado/Mundo)
+                const { lat, lng } = getCoordinatesByMode();
+                return await processLocation(lat, lng);
+    
+            } catch (error) {
+                lastError = error;
+                attempts++;
+                console.warn(`Attempt ${attempts}/${MAX_ATTEMPTS} failed:`, error);
+                await new Promise(resolve => setTimeout(resolve, 100 + (attempts * 50))); // Backoff progressivo
+            }
+        }
+    
+        // 3. Fallback Controlado
+        return getFallbackLocation(lastError);
+    }
 
-    while (attempts < MAX_ATTEMPTS) {
+    async function getCityLocation() {
+        // Estratégia 1: Busca por lugares específicos (restaurantes, pontos turísticos)
         try {
-            let coords;
-            switch (gameMode) {
-                case 'local':
-                    coords = getRandomLocalLocation();
-                    break;
-                case 'brazil':
-                    coords = getRandomBrazilLocation();
-                    break;
-                case 'world':
-                    coords = getRandomWorldLocation();
-                    break;
-                default:
-                    coords = getRandomBrazilLocation();
-            }
-
-            const panoramaData = await getPanoramaData(coords.lat, coords.lng);
-            const locationName = await getLocationName(
-                panoramaData.location.latLng.lat(),
-                panoramaData.location.latLng.lng()
-            );
-
-            // Registrar local usado
-            if (usedLocations.length > 100) {
-                usedLocations = usedLocations.slice(-50);
-            }
-            
-            usedLocations.push({
-                lat: panoramaData.location.latLng.lat(),
-                lng: panoramaData.location.latLng.lng()
-            });
-
-            return {
-                lat: panoramaData.location.latLng.lat(),
-                lng: panoramaData.location.latLng.lng(),
-                name: locationName
-            };
-
+            const places = await fetchQualityPlaces();
+            const randomPlace = selectRandomPlace(places);
+            return await validateAndRegisterLocation(randomPlace);
         } catch (error) {
-            lastError = error;
-            attempts++;
-            console.warn(`Attempt ${attempts}/${MAX_ATTEMPTS} failed:`, error);
-            await new Promise(resolve => setTimeout(resolve, 100 + (attempts * 50)));
+            console.warn("Place search failed, trying random street view:", error);
+            
+            // Estratégia 2: Busca aleatória dentro dos bounds
+            const randomCoords = generateRandomCoordinates(cityBounds);
+            return await validateAndRegisterLocation(randomCoords);
         }
     }
 
-    // Fallback
-    console.error("Fallback triggered:", lastError);
-    const coords = gameMode === 'local' ? getRandomLocalLocation() : 
-                  gameMode === 'brazil' ? getRandomBrazilLocation() : 
-                  getRandomWorldLocation();
+    async function fetchQualityPlaces() {
+        const center = cityBounds.getCenter();
+        const places = await getNearbyPlaces(center.lat(), center.lng(), 20000);
+        
+        return places.filter(place => 
+            place.photos?.length > 0 &&
+            place.rating >= 3.5 &&
+            place.user_ratings_total >= 10 &&
+            place.geometry &&
+            cityBounds.contains(place.geometry.location) &&
+            !isLocationUsed(place.geometry.location.lat(), place.geometry.location.lng())
+        );
+    }
     
-    return {
-        ...coords,
-        name: `Local Aleatório (${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)})`
-    };
-}
+    function selectRandomPlace(places) {
+        if (places.length === 0) throw new Error("No valid places available");
+        const randomPlace = places[Math.floor(Math.random() * places.length)];
+        return {
+            lat: randomPlace.geometry.location.lat(),
+            lng: randomPlace.geometry.location.lng(),
+            name: randomPlace.name
+        };
+    }
+
+    async function validateAndRegisterLocation(location) {
+        const panoramaData = await getPanoramaData(
+            location.lat, 
+            location.lng,
+            gameMode === 'city' ? 100 : 50000
+        );
+    
+        // Verificação extra para modo cidade
+        if (gameMode === 'city' && !cityBounds.contains(panoramaData.location.latLng)) {
+            throw new Error("Location outside city bounds");
+        }
+    
+        const locationName = await getLocationName(panoramaData, location);
+        registerUsedLocation(panoramaData);
+    
+        return {
+            lat: panoramaData.location.latLng.lat(),
+            lng: panoramaData.location.latLng.lng(),
+            name: locationName
+        };
+    }
+
+    async function getLocationName(panoramaData, originalLocation) {
+        return originalLocation.name || 
+               await getCityName(
+                   panoramaData.location.latLng.lat(),
+                   panoramaData.location.latLng.lng()
+               );
+    }
+    
+    function registerUsedLocation(panoramaData) {
+        // Limitar o cache para evitar memory leak
+        if (usedLocations.length > 100) {
+            usedLocations = usedLocations.slice(-50);
+        }
+        
+        usedLocations.push({
+            lat: panoramaData.location.latLng.lat(),
+            lng: panoramaData.location.latLng.lng()
+        });
+    }
+
+    function getFallbackLocation(error) {
+        console.error("Fallback triggered:", error);
+        
+        if (gameMode === 'city' && cityBounds) {
+            const coords = generateRandomCoordinates(cityBounds);
+            return {
+                ...coords,
+                name: `Local Aleatório (${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)})`
+            };
+        }
+        
+        const coords = getCoordinatesByMode();
+        return {
+            ...coords,
+            name: `Local Aleatório (${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)})`
+        };
+    }
+
+    function getCoordinatesByMode() {
+        switch (gameMode) {
+            case 'state': return getRandomStateLocation();
+            case 'brazil': return getRandomBrazilLocation();
+            case 'world': return getRandomWorldLocation();
+            default: throw new Error("Modo de jogo inválido");
+        }
+    }
+    
+    function generateRandomCoordinates(bounds) {
+        return {
+            lat: bounds.getSouthWest().lat() + Math.random() * 
+                (bounds.getNorthEast().lat() - bounds.getSouthWest().lat()),
+            lng: bounds.getSouthWest().lng() + Math.random() * 
+                (bounds.getNorthEast().lng() - bounds.getSouthWest().lng())
+        };
+    }
+
 
 function positionMarkerInStreetView() {
     const markerElement = document.getElementById('street-view-marker');
@@ -545,39 +724,32 @@ function positionMarkerInStreetView() {
     });
 }
 
-// Função initMap revisada
 async function initMap() {
+    // Hide loading overlay
+    document.getElementById('loadingOverlay').style.display = 'none';
+    
+    // First detect user location to set default state
     try {
         await detectUserLocation();
-        
-        // Ativação segura dos modos
-        const localModeElement = getSafeElement('localMode');
-        const brazilModeElement = getSafeElement('brazilMode');
-        
-        if (gameMode === 'local' && localModeElement) {
-            localModeElement.classList.add('active');
-        } else if (brazilModeElement) {
-            gameMode = 'brazil'; // Fallback seguro
-            brazilModeElement.classList.add('active');
+        if (userCity) {
+            gameMode = 'city';
+            document.getElementById('cityMode').classList.add('active');
+        } else {
+            // Se não detectar cidade, mostra capitais como fallback
+            gameMode = 'city';
+            document.getElementById('cityMode').classList.add('active');
         }
     } catch (error) {
-        console.error("Erro na detecção de localização:", error);
-        const brazilModeElement = getSafeElement('brazilMode');
-        if (brazilModeElement) {
-            gameMode = 'brazil';
-            brazilModeElement.classList.add('active');
-        }
+        console.error("Could not detect user location:", error);
+        // Fallback to Brazil if can't detect state
+        gameMode = 'brazil';
+        document.getElementById('brazilMode').classList.add('active');
+        document.getElementById('cityMode').classList.remove('active');
     }
-
-    // Inicialização do mapa com verificação segura
-    const mapElement = getSafeElement('map');
-    if (!mapElement) {
-        console.error('Elemento do mapa não encontrado');
-        return;
-    }
-
-    map = new google.maps.Map(mapElement, {
-        center: { lat: -14.2350, lng: -51.9253 },
+    
+    // Initialize map
+    map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: -14.2350, lng: -51.9253 }, // Approximate center of Brazil
         zoom: 4,
         disableDefaultUI: true,
         streetViewControl: false,
@@ -586,11 +758,13 @@ async function initMap() {
         mapTypeControl: false,
         zoomControl: true,
     });
-
+    
+    // Add click listener for placing markers
     map.addListener("click", function(event) {
         placeMarker(event.latLng);
     });
-
+    
+    // Start the game
     await newRound();
 }
 
@@ -612,10 +786,14 @@ function toggleMap() {
 }
 
 async function newRound() {
+    // Hide map and show street view
     document.getElementById('map-container').classList.remove('show');
     document.getElementById('street-view-container').style.display = 'block';
+    
+    // Hide distance meter
     document.getElementById('distanceMeter').style.display = 'none';
     
+    // Update round counter
     document.getElementById('roundCounter').textContent = `${roundsPlayed + 1}/${maxRounds}`;
     
     if (roundsPlayed >= maxRounds) {
@@ -623,6 +801,7 @@ async function newRound() {
         return;
     }
     
+    // Get a new random location
     correctLocation = await getRandomLocation();
     currentGameLocations.push({
         lat: correctLocation.lat,
@@ -630,6 +809,7 @@ async function newRound() {
         name: correctLocation.name
     });
     
+    // Initialize Street View panorama
     panorama = new google.maps.StreetViewPanorama(
         document.getElementById("street-view"), {
             position: correctLocation,
@@ -645,8 +825,10 @@ async function newRound() {
         }
     );
     
+    // Add marker in street view
     positionMarkerInStreetView();
     
+    // Clear any existing map marker
     if (marker) {
         marker.setMap(null);
         marker = null;
@@ -668,6 +850,7 @@ function placeMarker(location) {
             }
         });
         
+        // Center map on marker
         map.setCenter(location);
     }
 }
@@ -687,11 +870,13 @@ async function confirmGuess() {
     const correctPos = new google.maps.LatLng(correctLocation.lat, correctLocation.lng);
     currentDistance = google.maps.geometry.spherical.computeDistanceBetween(guessedPos, correctPos) / 1000;
 
+    // Se acertou (ex.: < 1 km)
     if (currentDistance < 1) {
         handleRoundResult(true);
         return;
     }
 
+    // Se ainda tem tentativas
     if (attempts < maxAttempts) {
         const heading = google.maps.geometry.spherical.computeHeading(guessedPos, correctPos);
         const direction = getDirectionFromHeading(heading);
@@ -718,18 +903,22 @@ async function confirmGuess() {
 }
 
 function getDirectionFromHeading(heading) {
+    // Normaliza o ângulo para 0-360
     const normalizedHeading = (heading + 360) % 360;
+    
+    // Determina a direção (0=Norte, 45=Nordeste, etc.)
     const directionIndex = Math.round(normalizedHeading / 45) % 8;
     
+    // URLs das imagens GIF das setas
     const directionArrows = [
-        'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExeGh2Zjl5bzA4ejZuNHp2eDl5eGxhZm9xaDd6YzJmdjRmd3p0c2IweiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/KDhyTMJgCWMsBlUDSq/giphy.gif',
-        'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcTc2dzZ2a3Npa2ljMjNpaWpqbzByZnJhOXN6bzljZnZiNHN5NnV0eSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/uK0YJtha6r7PzsLAwM/giphy.gif',
-        'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExeHk1OHcwd3NmZTFpN2lraHVpaTc3dmdvNjF2azh0ODg3aHgzbmN6NSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/CZRaIR4t4yOVGlBsXM/giphy.gif',
-        'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExdHlkZmI3ZmdsOHJzMXhnM3AwamRzeDNjd2UzM25uM2Q1ZHo3bWo3MyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/Yn5UkZDYJiwCBoaQDN/giphy.gif',
-        'https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExdnltbWJyMmV2NWJjMTI3dG95aDRqdHozZHF2Z2ozeHhsZ3c4ZDlhayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/cP53N7RJHVndLfPxdS/giphy.gif',
-        'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExdzBxcm5oajFhN3Z3eG1pajN0MG45bnJ2OXEwZ2xlejFiNjhkMHExYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/Q7XPCjjc3KMwaTCbLQ/giphy.gif',
-        'https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExYXJidnRkcmh4dHBvdGU1eGhyeXk0MzN4cXhqb2c0em83Ynp5OGN1MyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/ifER5WV3JrB8iKso8Y/giphy.gif',
-        'https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExY3oxcGgzNWtndGYzYmhxejdvZGR6dm52bTd2bmVwaHkzNmpkb3N6ZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/hU4d5hXTglhL62Tia3/giphy.gif'
+        'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExeGh2Zjl5bzA4ejZuNHp2eDl5eGxhZm9xaDd6YzJmdjRmd3p0c2IweiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/KDhyTMJgCWMsBlUDSq/giphy.gif', // Norte ↑
+        'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcTc2dzZ2a3Npa2ljMjNpaWpqbzByZnJhOXN6bzljZnZiNHN5NnV0eSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/uK0YJtha6r7PzsLAwM/giphy.gif', // Nordeste ↗
+        'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExeHk1OHcwd3NmZTFpN2lraHVpaTc3dmdvNjF2azh0ODg3aHgzbmN6NSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/CZRaIR4t4yOVGlBsXM/giphy.gif', // Leste →
+        'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExdHlkZmI3ZmdsOHJzMXhnM3AwamRzeDNjd2UzM25uM2Q1ZHo3bWo3MyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/Yn5UkZDYJiwCBoaQDN/giphy.gif', // Sudeste ↘
+        'https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExdnltbWJyMmV2NWJjMTI3dG95aDRqdHozZHF2Z2ozeHhsZ3c4ZDlhayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/cP53N7RJHVndLfPxdS/giphy.gif', // Sul ↓
+        'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExdzBxcm5oajFhN3Z3eG1pajN0MG45bnJ2OXEwZ2xlejFiNjhkMHExYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/Q7XPCjjc3KMwaTCbLQ/giphy.gif', // Sudoeste ↙
+        'https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExYXJidnRkcmh4dHBvdGU1eGhyeXk0MzN4cXhqb2c0em83Ynp5OGN1MyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/ifER5WV3JrB8iKso8Y/giphy.gif', // Oeste ←
+        'https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExY3oxcGgzNWtndGYzYmhxejdvZGR6dm52bTd2bmVwaHkzNmpkb3N6ZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/hU4d5hXTglhL62Tia3/giphy.gif'  // Noroeste ↖
     ];
     
     return directionArrows[directionIndex];
@@ -740,6 +929,7 @@ function handleRoundResult(isCorrect) {
     score += Math.round(points);
     document.getElementById("score").textContent = score;
 
+    // Mostra o resultado final da rodada
     const locationParts = correctLocation.name.split(', ');
     const city = locationParts[0];
     const country = locationParts.length > 1 ? locationParts[locationParts.length - 1] : correctLocation.name;
@@ -760,36 +950,38 @@ function handleRoundResult(isCorrect) {
         confirmButtonColor: '#3B82F6',
     }).then(() => {
         roundsPlayed++;
-        attempts = 1;
+        attempts = 1; // Reseta tentativas para a próxima rodada
         newRound();
     });
 }
 
 function calculatePoints(distance, attemptsUsed) {
     const basePoints = Math.max(0, 5000 - Math.floor(distance)) / 100;
+    // Penalidade de 20% por tentativa extra
     const penalty = (attemptsUsed - 1) * 0.2;
     return basePoints * (1 - penalty);
 }
 
 function endGame() {
+    // Calculate performance rating
     let rating, ratingColor;
     const averageDistance = currentGameLocations.reduce((sum, loc, idx) => {
-        if (idx === 0) return 0;
+        if (idx === 0) return 0; // Skip first round as we don't have distance
         return sum + loc.distance;
     }, 0) / (currentGameLocations.length - 1);
     
     if (averageDistance < 50) {
         rating = "Excelente";
-        ratingColor = "#10B981";
+        ratingColor = "#10B981"; // Emerald
     } else if (averageDistance < 200) {
         rating = "Bom";
-        ratingColor = "#3B82F6";
+        ratingColor = "#3B82F6"; // Blue
     } else if (averageDistance < 500) {
         rating = "Regular";
-        ratingColor = "#F59E0B";
+        ratingColor = "#F59E0B"; // Amber
     } else {
         rating = "Tente novamente";
-        ratingColor = "#EF4444";
+        ratingColor = "#EF4444"; // Red
     }
     
     Swal.fire({
@@ -826,19 +1018,25 @@ function endGame() {
     });
 }
 
-function resetGame() {
-    score = 0;
-    roundsPlayed = 0;
-    currentGameLocations = [];
-    gameSeed = Math.floor(Math.random() * 1000000);
+    function resetGame() {
+        score = 0;
+        roundsPlayed = 0;
+        currentGameLocations = [];
+        gameSeed = Math.floor(Math.random() * 1000000);
+        
+        // Resetar apenas para o modo cidade
+        if (gameMode === 'city') {
+            usedLocations = [];
+        }
+        
+        document.getElementById("score").textContent = score;
+        document.getElementById("roundCounter").textContent = `1/${maxRounds}`;
+        newRound();
+    }
     
-    document.getElementById("score").textContent = score;
-    document.getElementById("roundCounter").textContent = `1/${maxRounds}`;
-    newRound();
-}
 
 function shareResult() {
-    const shareText = `Acabei de jogar Gincaneiros no modo ${gameMode === 'local' ? 'Local' : gameMode === 'brazil' ? 'Brasil' : 'Mundo'} e marquei ${score} pontos! Tente bater meu recorde! 🌍`;
+    const shareText = `Acabei de jogar Gincaneiros no modo ${gameMode === 'state' ? 'Estado' : gameMode === 'brazil' ? 'Brasil' : 'Mundo'} e marquei ${score} pontos! Tente bater meu recorde! 🌍`;
     const shareUrl = window.location.href;
     
     if (navigator.share) {

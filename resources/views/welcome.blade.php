@@ -50,8 +50,8 @@
     <!-- Game Mode Selector -->
     <div class="game-mode-selector">
         <button class="game-mode-btn active" id="cityMode" onclick="showCityMenu()">
-            <i class="fas fa-city mr-1"></i> Cidades
-        </button>
+            <i class="fas fa-city mr-1"></i> Minha Cidade
+        </button>  
         <button class="game-mode-btn" id="brazilMode" onclick="setGameMode('brazil')">
             <i class="flag-icon flag-icon-br mr-1"></i> Brasil
         </button>
