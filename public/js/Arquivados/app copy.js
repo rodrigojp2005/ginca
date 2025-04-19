@@ -61,25 +61,25 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
 });
 
-// function showWelcomeAlert() {
-//     Swal.fire({
-//         title: "Bem-vindo ao Gincaneiros!",
-//         html: `
-//             <div class="text-left">
-//                 <p class="mb-3">Ajude o Jhon a encontrar-se no mapa!</p>
-//                 <p class="mb-1"><i class="fas fa-map-marker-alt text-blue-500 mr-2"></i> Explore a vista do Street View</p>
-//                 <p class="mb-1"><i class="fas fa-map-marked text-yellow-500 mr-2"></i> Marque seu palpite no mapa</p>
-//                 <p class="mb-1"><i class="fas fa-trophy text-yellow-400 mr-2"></i> Ganhe pontos por precisão</p>
-//             </div>
-//         `,
-//         imageUrl: "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExcnc3a3lvcHFrN2ZwZTV2bnJzb3ZrYWJjeTl6ZXB4YzE0N3NkMHU3MyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/A5PYmtufdQIjD37IC0/giphy.gif",
-//         imageWidth: 300,
-//         imageHeight: 150,
-//         imageAlt: "Cadê Jhon?",
-//         confirmButtonText: "Vamos começar!",
-//         confirmButtonColor: "#3B82F6",
-//     });
-// }
+function showWelcomeAlert() {
+    Swal.fire({
+        title: "Bem-vindo ao Gincaneiros!",
+        html: `
+            <div class="text-left">
+                <p class="mb-3">Ajude o Jhon a encontrar-se no mapa!</p>
+                <p class="mb-1"><i class="fas fa-map-marker-alt text-blue-500 mr-2"></i> Explore a vista do Street View</p>
+                <p class="mb-1"><i class="fas fa-map-marked text-yellow-500 mr-2"></i> Marque seu palpite no mapa</p>
+                <p class="mb-1"><i class="fas fa-trophy text-yellow-400 mr-2"></i> Ganhe pontos por precisão</p>
+            </div>
+        `,
+        imageUrl: "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExcnc3a3lvcHFrN2ZwZTV2bnJzb3ZrYWJjeTl6ZXB4YzE0N3NkMHU3MyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/A5PYmtufdQIjD37IC0/giphy.gif",
+        imageWidth: 300,
+        imageHeight: 150,
+        imageAlt: "Cadê Jhon?",
+        confirmButtonText: "Vamos começar!",
+        confirmButtonColor: "#3B82F6",
+    });
+}
 
 function setupEventListeners() {
     document.getElementById('mobile-menu-button').addEventListener('click', toggleMobileMenu);
@@ -117,91 +117,91 @@ function toggleMobileMenu() {
     document.getElementById('mobile-menu').classList.toggle('show');
 }
 
-// function showHowToPlay() {
-//     Swal.fire({
-//         title: '<i class="fas fa-question-circle text-blue-500 mr-2"></i> Como Jogar',
-//         html: `
-//             <div class="text-left space-y-3">
-//                 <div class="flex items-start">
-//                     <span class="bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">1</span>
-//                     <p>Você verá uma imagem do Google Street View</p>
-//                 </div>
-//                 <div class="flex items-start">
-//                     <span class="bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">2</span>
-//                     <p>Tente adivinhar onde essa localização está no mapa</p>
-//                 </div>
-//                 <div class="flex items-start">
-//                     <span class="bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">3</span>
-//                     <p>Clique no botão de mapa no canto inferior direito</p>
-//                 </div>
-//                 <div class="flex items-start">
-//                     <span class="bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">4</span>
-//                     <p>Marque seu palpite no mapa e confirme</p>
-//                 </div>
-//                 <div class="flex items-start">
-//                     <span class="bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">5</span>
-//                     <p>Quanto mais perto do local real, mais pontos você ganha!</p>
-//                 </div>
-//             </div>
-//         `,
-//         confirmButtonText: 'Entendi',
-//         confirmButtonColor: '#3B82F6',
-//         customClass: {
-//             popup: 'rounded-xl'
-//         }
-//     });
-//     document.getElementById('mobile-menu').classList.remove('show');
-// }
+function showHowToPlay() {
+    Swal.fire({
+        title: '<i class="fas fa-question-circle text-blue-500 mr-2"></i> Como Jogar',
+        html: `
+            <div class="text-left space-y-3">
+                <div class="flex items-start">
+                    <span class="bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">1</span>
+                    <p>Você verá uma imagem do Google Street View</p>
+                </div>
+                <div class="flex items-start">
+                    <span class="bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">2</span>
+                    <p>Tente adivinhar onde essa localização está no mapa</p>
+                </div>
+                <div class="flex items-start">
+                    <span class="bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">3</span>
+                    <p>Clique no botão de mapa no canto inferior direito</p>
+                </div>
+                <div class="flex items-start">
+                    <span class="bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">4</span>
+                    <p>Marque seu palpite no mapa e confirme</p>
+                </div>
+                <div class="flex items-start">
+                    <span class="bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">5</span>
+                    <p>Quanto mais perto do local real, mais pontos você ganha!</p>
+                </div>
+            </div>
+        `,
+        confirmButtonText: 'Entendi',
+        confirmButtonColor: '#3B82F6',
+        customClass: {
+            popup: 'rounded-xl'
+        }
+    });
+    document.getElementById('mobile-menu').classList.remove('show');
+}
 
-// function showAbout() {
-//     Swal.fire({
-//         title: '<i class="fas fa-info-circle text-blue-500 mr-2"></i> Sobre o Jogo',
-//         html: `
-//             <div class="text-left space-y-3">
-//                 <p><span class="font-semibold">Gincaneiros</span> é um jogo de geolocalização divertido e desafiador.</p>
+function showAbout() {
+    Swal.fire({
+        title: '<i class="fas fa-info-circle text-blue-500 mr-2"></i> Sobre o Jogo',
+        html: `
+            <div class="text-left space-y-3">
+                <p><span class="font-semibold">Gincaneiros</span> é um jogo de geolocalização divertido e desafiador.</p>
                 
-//                 <div class="bg-blue-50 p-3 rounded-lg">
-//                     <h3 class="font-semibold text-blue-800 mb-1">Modos de Jogo:</h3>
-//                     <ul class="list-disc pl-5 space-y-1">
-//                         <li><span class="font-medium">Estado:</span> Locais próximos a você</li>
-//                         <li><span class="font-medium">Brasil:</span> Desafios por todo o país</li>
-//                         <li><span class="font-medium">Mundo:</span> Explore locais globais</li>
-//                     </ul>
-//                 </div>
+                <div class="bg-blue-50 p-3 rounded-lg">
+                    <h3 class="font-semibold text-blue-800 mb-1">Modos de Jogo:</h3>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li><span class="font-medium">Estado:</span> Locais próximos a você</li>
+                        <li><span class="font-medium">Brasil:</span> Desafios por todo o país</li>
+                        <li><span class="font-medium">Mundo:</span> Explore locais globais</li>
+                    </ul>
+                </div>
                 
-//                 <p>Desenvolvido com ❤️ para amantes de geografia e aventura!</p>
-//             </div>
-//         `,
-//         confirmButtonText: 'Legal!',
-//         confirmButtonColor: '#3B82F6'
-//     });
-//     document.getElementById('mobile-menu').classList.remove('show');
-// }
+                <p>Desenvolvido com ❤️ para amantes de geografia e aventura!</p>
+            </div>
+        `,
+        confirmButtonText: 'Legal!',
+        confirmButtonColor: '#3B82F6'
+    });
+    document.getElementById('mobile-menu').classList.remove('show');
+}
 
-// function showContact() {
-//     Swal.fire({
-//         title: '<i class="fas fa-envelope text-blue-500 mr-2"></i> Contato',
-//         html: `
-//             <div class="text-left space-y-3">
-//                 <p>Dúvidas, sugestões ou problemas?</p>
-//                 <p>Entre em contato conosco:</p>
+function showContact() {
+    Swal.fire({
+        title: '<i class="fas fa-envelope text-blue-500 mr-2"></i> Contato',
+        html: `
+            <div class="text-left space-y-3">
+                <p>Dúvidas, sugestões ou problemas?</p>
+                <p>Entre em contato conosco:</p>
                 
-//                 <div class="flex items-center">
-//                     <i class="fas fa-phone-alt text-blue-500 mr-3"></i>
-//                     <span class="font-medium">(53) 98105-6952</span>
-//                 </div>
+                <div class="flex items-center">
+                    <i class="fas fa-phone-alt text-blue-500 mr-3"></i>
+                    <span class="font-medium">(53) 98105-6952</span>
+                </div>
                 
-//                 <div class="flex items-center">
-//                     <i class="fas fa-envelope text-blue-500 mr-3"></i>
-//                     <span class="font-medium">contato@gincaneiros.com</span>
-//                 </div>
-//             </div>
-//         `,
-//         confirmButtonText: 'Fechar',
-//         confirmButtonColor: '#3B82F6'
-//     });
-//     document.getElementById('mobile-menu').classList.remove('show');
-// }
+                <div class="flex items-center">
+                    <i class="fas fa-envelope text-blue-500 mr-3"></i>
+                    <span class="font-medium">contato@gincaneiros.com</span>
+                </div>
+            </div>
+        `,
+        confirmButtonText: 'Fechar',
+        confirmButtonColor: '#3B82F6'
+    });
+    document.getElementById('mobile-menu').classList.remove('show');
+}
 
 function setGameMode(mode) {
     gameMode = mode;
@@ -321,28 +321,28 @@ async function detectUserLocation() {
     });
 }
 
-// function showCityMenu() {
-//     const menuHtml = `
-//         <div id="cityMenu" class="shadow-lg">
-//             ${brazilianCapitals.map(city => `
-//                 <div onclick="selectCity('${city.name}', '${city.state}', ${city.lat}, ${city.lng})">
-//                     <i class="fas fa-city text-blue-500 mr-2"></i>
-//                     ${city.name} - ${city.state}
-//                 </div>
-//             `).join('')}
-//         </div>
-//     `;
+function showCityMenu() {
+    const menuHtml = `
+        <div id="cityMenu" class="shadow-lg">
+            ${brazilianCapitals.map(city => `
+                <div onclick="selectCity('${city.name}', '${city.state}', ${city.lat}, ${city.lng})">
+                    <i class="fas fa-city text-blue-500 mr-2"></i>
+                    ${city.name} - ${city.state}
+                </div>
+            `).join('')}
+        </div>
+    `;
     
-//     const existingMenu = document.getElementById('cityMenu');
-//     if (existingMenu) existingMenu.remove();
+    const existingMenu = document.getElementById('cityMenu');
+    if (existingMenu) existingMenu.remove();
     
-//     const cityButton = document.getElementById('cityMode');
-//     cityButton.insertAdjacentHTML('afterend', menuHtml);
+    const cityButton = document.getElementById('cityMode');
+    cityButton.insertAdjacentHTML('afterend', menuHtml);
     
-//     setTimeout(() => {
-//         document.addEventListener('click', closeCityMenu);
-//     }, 100);
-// }
+    setTimeout(() => {
+        document.addEventListener('click', closeCityMenu);
+    }, 100);
+}
 
 function closeCityMenu(e) {
     const cityMenu = document.getElementById('cityMenu');
@@ -542,150 +542,106 @@ async function getCityName(lat, lng) {
 }
 
 async function getRandomLocation() {
-        const MAX_ATTEMPTS = 20;
-        let attempts = 0;
-        let lastError = null;
+    const maxAttempts = 20;
+    let attempts = 0;
     
-        while (attempts < MAX_ATTEMPTS) {
-            try {
-                // 1. Modo Cidade (GPS) - Lógica Aprimorada
-                if (gameMode === 'city' && cityBounds) {
-                    return await getCityLocation();
-                }
-    
-                // 2. Outros Modos (Brasil/Estado/Mundo)
-                const { lat, lng } = getCoordinatesByMode();
-                return await processLocation(lat, lng);
-    
-            } catch (error) {
-                lastError = error;
-                attempts++;
-                console.warn(`Attempt ${attempts}/${MAX_ATTEMPTS} failed:`, error);
-                await new Promise(resolve => setTimeout(resolve, 100 + (attempts * 50))); // Backoff progressivo
-            }
-        }
-    
-        // 3. Fallback Controlado
-        return getFallbackLocation(lastError);
-    }
-
-    async function getCityLocation() {
-        // Estratégia 1: Busca por lugares específicos (restaurantes, pontos turísticos)
+    while (attempts < maxAttempts) {
         try {
-            const places = await fetchQualityPlaces();
-            const randomPlace = selectRandomPlace(places);
-            return await validateAndRegisterLocation(randomPlace);
-        } catch (error) {
-            console.warn("Place search failed, trying random street view:", error);
+            // Estratégia diferente para o modo estado com geolocalização
+            if (gameMode === 'city' && cityBounds) {
+                // Tentar primeiro encontrar lugares próximos (restaurantes)
+                try {
+                    const center = cityBounds.getCenter();
+                    const places = await getNearbyPlaces(center.lat(), center.lng(), 20000); // Raio de 20km
+                    
+                    // Escolher um lugar aleatório
+                    const randomPlace = places[Math.floor(Math.random() * places.length)];
+                    const placeLocation = randomPlace.geometry.location;
+                    
+                    // Verificar se o panorama está disponível
+                    const panoramaData = await getPanoramaData(
+                        placeLocation.lat(), 
+                        placeLocation.lng(),
+                        100 // Raio menor para lugares específicos
+                    );
+                    
+                    // Obter nome do lugar
+                    const locationName = randomPlace.name || await getCityName(
+                        placeLocation.lat(), 
+                        placeLocation.lng()
+                    );
+                    
+                    // Adicionar ao cache de locais usados
+                    usedLocations.push({
+                        lat: placeLocation.lat(),
+                        lng: placeLocation.lng()
+                    });
+                    
+                    return {
+                        lat: placeLocation.lat(),
+                        lng: placeLocation.lng(),
+                        name: locationName
+                    };
+                } catch (placeError) {
+                    console.log("Falling back to random street view for state mode:", placeError);
+                    // Se falhar, continuar com a abordagem normal
+                }
+            }
             
-            // Estratégia 2: Busca aleatória dentro dos bounds
-            const randomCoords = generateRandomCoordinates(cityBounds);
-            return await validateAndRegisterLocation(randomCoords);
-        }
-    }
-
-    async function fetchQualityPlaces() {
-        const center = cityBounds.getCenter();
-        const places = await getNearbyPlaces(center.lat(), center.lng(), 20000);
-        
-        return places.filter(place => 
-            place.photos?.length > 0 &&
-            place.rating >= 3.5 &&
-            place.user_ratings_total >= 10 &&
-            place.geometry &&
-            cityBounds.contains(place.geometry.location) &&
-            !isLocationUsed(place.geometry.location.lat(), place.geometry.location.lng())
-        );
-    }
-    
-    function selectRandomPlace(places) {
-        if (places.length === 0) throw new Error("No valid places available");
-        const randomPlace = places[Math.floor(Math.random() * places.length)];
-        return {
-            lat: randomPlace.geometry.location.lat(),
-            lng: randomPlace.geometry.location.lng(),
-            name: randomPlace.name
-        };
-    }
-
-    async function validateAndRegisterLocation(location) {
-        const panoramaData = await getPanoramaData(
-            location.lat, 
-            location.lng,
-            gameMode === 'city' ? 100 : 50000
-        );
-    
-        // Verificação extra para modo cidade
-        if (gameMode === 'city' && !cityBounds.contains(panoramaData.location.latLng)) {
-            throw new Error("Location outside city bounds");
-        }
-    
-        const locationName = await getLocationName(panoramaData, location);
-        registerUsedLocation(panoramaData);
-    
-        return {
-            lat: panoramaData.location.latLng.lat(),
-            lng: panoramaData.location.latLng.lng(),
-            name: locationName
-        };
-    }
-
-    async function getLocationName(panoramaData, originalLocation) {
-        return originalLocation.name || 
-               await getCityName(
-                   panoramaData.location.latLng.lat(),
-                   panoramaData.location.latLng.lng()
-               );
-    }
-    
-    function registerUsedLocation(panoramaData) {
-        // Limitar o cache para evitar memory leak
-        if (usedLocations.length > 100) {
-            usedLocations = usedLocations.slice(-50);
-        }
-        
-        usedLocations.push({
-            lat: panoramaData.location.latLng.lat(),
-            lng: panoramaData.location.latLng.lng()
-        });
-    }
-
-    function getFallbackLocation(error) {
-        console.error("Fallback triggered:", error);
-        
-        if (gameMode === 'city' && cityBounds) {
-            const coords = generateRandomCoordinates(cityBounds);
+            // Abordagem original para outros modos ou fallback
+            let lat, lng;
+            
+            switch (gameMode) {
+                case 'state':
+                    const stateCoords = getRandomStateLocation();
+                    lat = stateCoords.lat;
+                    lng = stateCoords.lng;
+                    break;
+                case 'brazil':
+                    const brazilCoords = getRandomBrazilLocation();
+                    lat = brazilCoords.lat;
+                    lng = brazilCoords.lng;
+                    break;
+                case 'world':
+                    const worldCoords = getRandomWorldLocation();
+                    lat = worldCoords.lat;
+                    lng = worldCoords.lng;
+                    break;
+            }
+            
+            const panoramaData = await getPanoramaData(lat, lng);
+            const locationName = await getCityName(
+                panoramaData.location.latLng.lat(),
+                panoramaData.location.latLng.lng()
+            );
+            
+            // Adicionar ao cache de locais usados
+            usedLocations.push({
+                lat: panoramaData.location.latLng.lat(),
+                lng: panoramaData.location.latLng.lng()
+            });
+            
             return {
-                ...coords,
-                name: `Local Aleatório (${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)})`
+                lat: panoramaData.location.latLng.lat(),
+                lng: panoramaData.location.latLng.lng(),
+                name: locationName
             };
-        }
-        
-        const coords = getCoordinatesByMode();
-        return {
-            ...coords,
-            name: `Local Aleatório (${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)})`
-        };
-    }
-
-    function getCoordinatesByMode() {
-        switch (gameMode) {
-            case 'state': return getRandomStateLocation();
-            case 'brazil': return getRandomBrazilLocation();
-            case 'world': return getRandomWorldLocation();
-            default: throw new Error("Modo de jogo inválido");
+        } catch (error) {
+            attempts++;
+            await new Promise(resolve => setTimeout(resolve, 100));
         }
     }
     
-    function generateRandomCoordinates(bounds) {
-        return {
-            lat: bounds.getSouthWest().lat() + Math.random() * 
-                (bounds.getNorthEast().lat() - bounds.getSouthWest().lat()),
-            lng: bounds.getSouthWest().lng() + Math.random() * 
-                (bounds.getNorthEast().lng() - bounds.getSouthWest().lng())
-        };
-    }
-
+    // Fallback extremo
+    console.warn("Using random location fallback after", maxAttempts, "attempts");
+    const fallbackCoords = gameMode === 'brazil' ? getRandomBrazilLocation() :
+                          gameMode === 'state' ? getRandomStateLocation() : getRandomWorldLocation();
+    return {
+        lat: fallbackCoords.lat,
+        lng: fallbackCoords.lng,
+        name: `Local (${fallbackCoords.lat.toFixed(4)}, ${fallbackCoords.lng.toFixed(4)})`
+    };
+}
 
 function positionMarkerInStreetView() {
     const markerElement = document.getElementById('street-view-marker');
@@ -756,7 +712,7 @@ async function initMap() {
         gestureHandling: "greedy",
         fullscreenControl: false,
         mapTypeControl: false,
-        zoomControl: true,
+        zoomControl: false,
     });
     
     // Add click listener for placing markers
@@ -1018,22 +974,15 @@ function endGame() {
     });
 }
 
-    function resetGame() {
-        score = 0;
-        roundsPlayed = 0;
-        currentGameLocations = [];
-        gameSeed = Math.floor(Math.random() * 1000000);
-        
-        // Resetar apenas para o modo cidade
-        if (gameMode === 'city') {
-            usedLocations = [];
-        }
-        
-        document.getElementById("score").textContent = score;
-        document.getElementById("roundCounter").textContent = `1/${maxRounds}`;
-        newRound();
-    }
-    
+function resetGame() {
+    score = 0;
+    roundsPlayed = 0;
+    currentGameLocations = [];
+    gameSeed = Math.floor(Math.random() * 1000000);
+    document.getElementById("score").textContent = score;
+    document.getElementById("roundCounter").textContent = `1/${maxRounds}`;
+    newRound();
+}
 
 function shareResult() {
     const shareText = `Acabei de jogar Gincaneiros no modo ${gameMode === 'state' ? 'Estado' : gameMode === 'brazil' ? 'Brasil' : 'Mundo'} e marquei ${score} pontos! Tente bater meu recorde! 🌍`;
@@ -1053,59 +1002,59 @@ function shareResult() {
     }
 }
 
-// function showShareFallback(text, url) {
-//     const encodedText = encodeURIComponent(text);
-//     const encodedUrl = encodeURIComponent(url);
+function showShareFallback(text, url) {
+    const encodedText = encodeURIComponent(text);
+    const encodedUrl = encodeURIComponent(url);
     
-//     Swal.fire({
-//         title: 'Compartilhar Resultado',
-//         html: `
-//             <div class="space-y-3">
-//                 <p>Compartilhe sua pontuação com os amigos:</p>
-//                 <div class="grid grid-cols-2 gap-2">
-//                     <a href="https://wa.me/?text=${encodedText}%20${encodedUrl}" class="flex items-center justify-center gap-2 bg-green-500 text-white py-2 px-4 rounded-lg" target="_blank">
-//                         <i class="fab fa-whatsapp"></i> WhatsApp
-//                     </a>
-//                     <a href="https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}" class="flex items-center justify-center gap-2 bg-blue-600 text-white py-2 px-4 rounded-lg" target="_blank">
-//                         <i class="fab fa-facebook-f"></i> Facebook
-//                     </a>
-//                     <a href="https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}" class="flex items-center justify-center gap-2 bg-blue-400 text-white py-2 px-4 rounded-lg" target="_blank">
-//                         <i class="fab fa-twitter"></i> Twitter
-//                     </a>
-//                     <a href="#" onclick="navigator.clipboard.writeText('${text} ' + '${url}'); Swal.fire('Link copiado!', 'Cole em qualquer lugar para compartilhar.', 'success'); return false;" class="flex items-center justify-center gap-2 bg-gray-600 text-white py-2 px-4 rounded-lg">
-//                         <i class="fas fa-link"></i> Copiar Link
-//                     </a>
-//                 </div>
-//             </div>
-//         `,
-//         showConfirmButton: false,
-//         showCloseButton: true
-//     });
-// }
+    Swal.fire({
+        title: 'Compartilhar Resultado',
+        html: `
+            <div class="space-y-3">
+                <p>Compartilhe sua pontuação com os amigos:</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <a href="https://wa.me/?text=${encodedText}%20${encodedUrl}" class="flex items-center justify-center gap-2 bg-green-500 text-white py-2 px-4 rounded-lg" target="_blank">
+                        <i class="fab fa-whatsapp"></i> WhatsApp
+                    </a>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}" class="flex items-center justify-center gap-2 bg-blue-600 text-white py-2 px-4 rounded-lg" target="_blank">
+                        <i class="fab fa-facebook-f"></i> Facebook
+                    </a>
+                    <a href="https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}" class="flex items-center justify-center gap-2 bg-blue-400 text-white py-2 px-4 rounded-lg" target="_blank">
+                        <i class="fab fa-twitter"></i> Twitter
+                    </a>
+                    <a href="#" onclick="navigator.clipboard.writeText('${text} ' + '${url}'); Swal.fire('Link copiado!', 'Cole em qualquer lugar para compartilhar.', 'success'); return false;" class="flex items-center justify-center gap-2 bg-gray-600 text-white py-2 px-4 rounded-lg">
+                        <i class="fas fa-link"></i> Copiar Link
+                    </a>
+                </div>
+            </div>
+        `,
+        showConfirmButton: false,
+        showCloseButton: true
+    });
+}
 
-// function shareOnFacebook() {
-//     const url = encodeURIComponent(window.location.href);
-//     window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
-// }
+function shareOnFacebook() {
+    const url = encodeURIComponent(window.location.href);
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+}
 
-// function shareOnInstagram() {
-//     Swal.fire({
-//         title: 'Compartilhar no Instagram',
-//         text: 'Para compartilhar no Instagram, você pode postar um story com o link do jogo!',
-//         icon: 'info',
-//         confirmButtonText: 'OK',
-//         confirmButtonColor: '#3B82F6'
-//     });
-// }
+function shareOnInstagram() {
+    Swal.fire({
+        title: 'Compartilhar no Instagram',
+        text: 'Para compartilhar no Instagram, você pode postar um story com o link do jogo!',
+        icon: 'info',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#3B82F6'
+    });
+}
 
-// function shareOnWhatsApp() {
-//     const text = encodeURIComponent("Estou jogando Gincaneiros, um jogo incrível de geolocalização! Tente bater meu recorde: ");
-//     const url = encodeURIComponent(window.location.href);
-//     window.open(`https://wa.me/?text=${text}${url}`, '_blank');
-// }
+function shareOnWhatsApp() {
+    const text = encodeURIComponent("Estou jogando Gincaneiros, um jogo incrível de geolocalização! Tente bater meu recorde: ");
+    const url = encodeURIComponent(window.location.href);
+    window.open(`https://wa.me/?text=${text}${url}`, '_blank');
+}
 
-// function shareOnTwitter() {
-//     const text = encodeURIComponent("Acabei de jogar Gincaneiros e marquei " + score + " pontos! Tente bater meu recorde!");
-//     const url = encodeURIComponent(window.location.href);
-//     window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
-// }
+function shareOnTwitter() {
+    const text = encodeURIComponent("Acabei de jogar Gincaneiros e marquei " + score + " pontos! Tente bater meu recorde!");
+    const url = encodeURIComponent(window.location.href);
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+}
