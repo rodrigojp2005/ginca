@@ -11,7 +11,7 @@ let gameSeed = Math.floor(Math.random() * 1000000);
 let usedLocations = [];
 let lastLocationRegion = null;
 let gameMode = 'local';
-let userLocation =                              null;
+let userLocation = null;
 let localBounds = null;
 let currentDistance = 0;
 let attempts = 1;
@@ -34,41 +34,20 @@ function getSafeElement(id) {
     }
     return element;
 }
-
+// Initialize the game when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    const savedGame = JSON.parse(localStorage.getItem('savedGame'));
-
-    if (savedGame) {
-        score = savedGame.score || 0;
-        roundsPlayed = savedGame.roundsPlayed || 0;
-        currentGameLocations = savedGame.currentGameLocations || [];
-        gameMode = savedGame.gameMode || 'local';
-
-        document.getElementById("score").textContent = score;
-        document.getElementById("roundCounter").textContent = `${roundsPlayed + 1}/5`;
-
-        // Limpar para não carregar salvo de novo no futuro
-        localStorage.removeItem('savedGame');
-
-        console.log("Jogo recuperado do localStorage!");
+    // Verificação segura de elementos antes de usar
+    const loadingOverlay = getSafeElement('loadingOverlay');
+    if (loadingOverlay) {
+        loadingOverlay.style.display = 'none';
+    } else {
+        console.warn('Elemento loadingOverlay não encontrado');
     }
 
     setTimeout(showWelcomeAlert, 1500);
     setupEventListeners();
-    initMap().then(() => {
-        hideLoadingOverlay();
-    }).catch(error => {
-        console.error("Erro ao inicializar o mapa:", error);
-        hideLoadingOverlay();
-    });
+    initMap();
 });
-function hideLoadingOverlay() {
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    if (loadingOverlay) {
-        loadingOverlay.style.display = 'none';
-    }
-}
-
 
 function showWelcomeAlert() {
     Swal.fire({
@@ -512,41 +491,22 @@ async function getRandomLocation() {
         } catch (error) {
             lastError = error;
             attempts++;
-            console.warn(`Tentativa ${attempts}/${MAX_ATTEMPTS} falhou:`, error);
+            console.warn(`Attempt ${attempts}/${MAX_ATTEMPTS} failed:`, error);
             await new Promise(resolve => setTimeout(resolve, 100 + (attempts * 50)));
         }
     }
 
-    // ⚡ Se falhou todas tentativas:
-    console.error("Todas tentativas falharam:", lastError);
-
-    // 🚀 SALVAR progresso antes de atualizar:
-    localStorage.setItem('savedGame', JSON.stringify({
-        score: score,
-        roundsPlayed: roundsPlayed,
-        currentGameLocations: currentGameLocations,
-        gameMode: gameMode
-    }));
-
-    await Swal.fire({
-        title: 'Não conseguimos encontrar um local válido 😢',
-        html: `
-            <div class="text-left space-y-2">
-                <p>Tentamos encontrar um local para você jogar, mas não conseguimos!</p>
-                <p><b>Vamos atualizar a página para tentar novamente.</b></p>
-                <p class="text-sm text-gray-500">Se o problema persistir, tente mudar o modo de jogo.</p>
-            </div>
-        `,
-        icon: 'error',
-        confirmButtonText: 'Atualizar Página',
-        confirmButtonColor: '#3B82F6'
-    });
-
-    window.location.reload();
-
-    return new Promise(() => {}); // trava para evitar erro depois do reload
+    // Fallback
+    console.error("Fallback triggered:", lastError);
+    const coords = gameMode === 'local' ? getRandomLocalLocation() : 
+                  gameMode === 'brazil' ? getRandomBrazilLocation() : 
+                  getRandomWorldLocation();
+    
+    return {
+        ...coords,
+        name: `Local Aleatório (${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)})`
+    };
 }
-
 
 function positionMarkerInStreetView() {
     const markerElement = document.getElementById('street-view-marker');
@@ -613,7 +573,7 @@ async function initMap() {
     const mapElement = getSafeElement('map');
     if (!mapElement) {
         console.error('Elemento do mapa não encontrado');
-        return Promise.reject('Elemento do mapa não encontrado');
+        return;
     }
 
     map = new google.maps.Map(mapElement, {
@@ -631,7 +591,7 @@ async function initMap() {
         placeMarker(event.latLng);
     });
 
-    return newRound();
+    await newRound();
 }
 
 function toggleMap() {
